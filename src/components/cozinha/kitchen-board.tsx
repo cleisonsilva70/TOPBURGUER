@@ -238,7 +238,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
             </p>
           </div>
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:flex-wrap">
-            <div className="rounded-[24px] bg-[var(--foreground)] px-5 py-4 text-white">
+            <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(35,21,15,0.96),rgba(57,31,21,0.92))] px-5 py-4 text-white shadow-[0_20px_50px_rgba(35,21,15,0.24)]">
               <p className="text-xs uppercase tracking-[0.24em] text-white/70">
                 Pedidos pagos
               </p>
@@ -250,10 +250,10 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
               type="button"
               onClick={() => setSoundEnabled((current) => !current)}
               className={cn(
-                "rounded-full border px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] transition-colors",
+                "rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] transition-colors",
                 soundEnabled
-                  ? "border-[var(--brand)] bg-[rgba(184,68,31,0.08)] text-[var(--brand)]"
-                  : "border-[var(--line)] bg-white/70 text-[var(--muted)] hover:bg-white",
+                  ? "glass-pill text-[var(--brand)]"
+                  : "glass-pill text-[var(--muted)] hover:bg-white",
               )}
             >
               {soundEnabled ? "Campainha ligada" : "Campainha desligada"}
@@ -261,19 +261,19 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
             <button
               type="button"
               onClick={playAlertTone}
-              className="rounded-full border border-[var(--line)] bg-white/70 px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+              className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
             >
               Testar som
             </button>
             <Link
               href="/atendimento"
-              className="rounded-full border border-[var(--line)] bg-white/70 px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+              className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
             >
               Abrir atendimento
             </Link>
             <Link
               href="/painel"
-              className="rounded-full border border-[var(--line)] bg-white/70 px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+              className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
             >
               Editar catalogo
             </Link>
@@ -313,7 +313,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
 
             <div className="space-y-4">
               {groupedOrders[status].length === 0 ? (
-                <div className="rounded-[22px] border border-dashed border-[var(--line)] bg-white/60 p-4 text-sm text-[var(--muted)]">
+                <div className="panel-subtle border-dashed p-4 text-sm text-[var(--muted)]">
                   Nenhum pedido nesta coluna.
                 </div>
               ) : (
@@ -327,7 +327,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                     <article
                       key={order.id}
                       className={cn(
-                        "rounded-[24px] border bg-white p-4",
+                        "relative overflow-hidden rounded-[24px] border bg-white p-4 shadow-[0_12px_30px_rgba(46,23,12,0.06)]",
                         isFresh
                           ? "border-[var(--brand)] shadow-[0_0_0_2px_rgba(184,68,31,0.12)]"
                           : isDelayed
@@ -335,6 +335,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                             : "border-[var(--line)]",
                       )}
                     >
+                      <div className="absolute right-0 top-0 h-20 w-20 rounded-full bg-[color-mix(in_srgb,var(--accent)_28%,transparent)] blur-2xl" />
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">

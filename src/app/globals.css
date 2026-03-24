@@ -1,18 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6efe5;
-  --surface: #fff9f2;
-  --surface-strong: #fff4e8;
-  --foreground: #23150f;
-  --muted: #73574c;
-  --line: rgba(70, 37, 17, 0.12);
+  --background: #f7efe3;
+  --surface: #fffaf3;
+  --surface-strong: #fff0de;
+  --foreground: #22130d;
+  --muted: #6d5447;
+  --line: rgba(70, 37, 17, 0.1);
   --brand: #b8441f;
   --brand-strong: #912f12;
   --accent: #ffbf47;
   --success: #27936c;
   --danger: #b33f2f;
-  --shadow: 0 24px 60px rgba(74, 38, 19, 0.14);
+  --shadow: 0 28px 80px rgba(55, 26, 12, 0.12);
+  --shadow-soft: 0 16px 34px rgba(55, 26, 12, 0.08);
+  --radius-xl: 32px;
 }
 
 @theme inline {
@@ -45,9 +47,11 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 26%, transparent), transparent 30%),
-    radial-gradient(circle at top right, color-mix(in srgb, var(--brand) 18%, transparent), transparent 26%),
-    linear-gradient(180deg, #fff4df 0%, #f7efe6 38%, #f2e6d8 100%);
+    radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 22%, transparent), transparent 28%),
+    radial-gradient(circle at 85% 12%, color-mix(in srgb, var(--brand) 18%, transparent), transparent 24%),
+    radial-gradient(circle at 50% 100%, rgba(255, 255, 255, 0.72), transparent 38%),
+    linear-gradient(180deg, #fff5e5 0%, #f9f0e6 34%, #f3e6d7 100%);
+  background-attachment: fixed;
 }
 
 a {
@@ -74,7 +78,40 @@ textarea {
 
 .panel-card {
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255, 252, 247, 0.95), rgba(255, 247, 238, 0.92));
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.96), rgba(255, 246, 235, 0.92)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.35), transparent 60%);
   box-shadow: var(--shadow);
-  border-radius: 28px;
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(14px);
+}
+
+.panel-subtle {
+  border: 1px solid rgba(70, 37, 17, 0.08);
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: var(--shadow-soft);
+  border-radius: 24px;
+}
+
+.glass-pill {
+  border: 1px solid rgba(70, 37, 17, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 24px rgba(55, 26, 12, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-grid {
+  position: relative;
+}
+
+.dashboard-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(110, 80, 57, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(110, 80, 57, 0.035) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 92%);
 }

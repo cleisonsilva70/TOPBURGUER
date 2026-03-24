@@ -104,7 +104,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
             </p>
           </div>
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <div className="rounded-[24px] bg-[var(--foreground)] px-5 py-4 text-white">
+            <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(35,21,15,0.96),rgba(57,31,21,0.92))] px-5 py-4 text-white shadow-[0_20px_50px_rgba(35,21,15,0.24)]">
               <p className="text-xs uppercase tracking-[0.24em] text-white/70">
                 Aguardando pagamento
               </p>
@@ -113,13 +113,13 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
             </div>
             <Link
               href="/cozinha"
-              className="rounded-full border border-[var(--line)] bg-white/70 px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+              className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
             >
               Ir para cozinha
             </Link>
             <Link
               href="/painel"
-              className="rounded-full border border-[var(--line)] bg-white/70 px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+              className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
             >
               Editar catalogo
             </Link>
@@ -138,7 +138,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
 
       <section className="grid gap-5 xl:grid-cols-2">
         {orders.length === 0 ? (
-          <div className="panel-card p-6 text-sm text-[var(--muted)] xl:col-span-2">
+          <div className="panel-card p-8 text-center text-sm text-[var(--muted)] xl:col-span-2">
             Nenhum pedido aguardando pagamento no momento.
           </div>
         ) : (
@@ -146,10 +146,11 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
             <article
               key={order.id}
               className={cn(
-                "panel-card p-6",
+                "panel-card relative overflow-hidden p-6",
                 loadingId === order.id ? "opacity-75" : "",
               )}
             >
+              <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-[color-mix(in_srgb,var(--accent)_32%,transparent)] blur-2xl" />
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
@@ -160,13 +161,13 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
                     {order.displayTime} | {paymentStatusLabels[order.paymentStatus]}
                   </p>
                 </div>
-                <span className="rounded-full bg-[var(--surface-strong)] px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[var(--foreground)]">
+                <span className="glass-pill rounded-full px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[var(--foreground)]">
                   {paymentLabels[order.paymentMethod]}
                 </span>
               </div>
 
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-[22px] border border-[var(--line)] bg-white/80 p-4 text-sm leading-7 text-[var(--muted)]">
+                <div className="panel-subtle p-4 text-sm leading-7 text-[var(--muted)]">
                   <p><strong className="text-[var(--foreground)]">Telefone:</strong> {order.phone}</p>
                   <p><strong className="text-[var(--foreground)]">Endereco:</strong> {order.address}, {order.houseNumber}</p>
                   {order.deliveryArea ? (
@@ -177,7 +178,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
                   ) : null}
                 </div>
 
-                <div className="rounded-[22px] border border-[var(--line)] bg-[var(--foreground)] p-4 text-white">
+                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(35,21,15,0.98),rgba(57,31,21,0.92))] p-4 text-white shadow-[0_18px_38px_rgba(35,21,15,0.18)]">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
                     Itens
                   </p>
@@ -194,7 +195,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
               </div>
 
               <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="rounded-[18px] bg-[var(--surface)] px-4 py-3">
+                <div className="glass-pill rounded-[18px] px-4 py-3">
                   <span className="text-sm text-[var(--muted)]">Total do pedido</span>
                   <strong className="ml-3 text-lg text-[var(--brand)]">{formatCurrency(order.total)}</strong>
                 </div>

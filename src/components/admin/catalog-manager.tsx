@@ -486,20 +486,20 @@ export function CatalogManager() {
             <Link
               href="/"
               target="_blank"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--line)] bg-white px-5 py-3 text-sm font-bold uppercase tracking-[0.14em]"
+              className="glass-pill inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em]"
             >
               Ver vitrine
               <ExternalLink size={16} />
             </Link>
             <Link
               href="/atendimento"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--line)] bg-white px-5 py-3 text-sm font-bold uppercase tracking-[0.14em]"
+              className="glass-pill inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em]"
             >
               Abrir atendimento
             </Link>
             <Link
               href="/cozinha"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--foreground)] px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,rgba(35,21,15,0.96),rgba(57,31,21,0.92))] px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white shadow-[0_18px_38px_rgba(35,21,15,0.18)]"
             >
               Abrir cozinha
             </Link>
