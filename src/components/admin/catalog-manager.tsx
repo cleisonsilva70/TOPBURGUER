@@ -158,8 +158,8 @@ function PanelNav({
             onClick={() => onChange(section.id)}
             className={`rounded-[24px] border p-4 text-left transition-all ${
               active
-                ? "border-[var(--brand)] bg-[var(--brand)] text-white shadow-[0_16px_40px_rgba(0,0,0,0.12)]"
-                : "border-[var(--line)] bg-white/75 text-[var(--foreground)] hover:border-[var(--brand)]"
+                ? "border-[var(--brand)] bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] text-white shadow-[0_16px_40px_rgba(145,47,18,0.18)]"
+                : "border-[var(--line)] bg-white/75 text-[var(--foreground)] hover:border-[var(--brand)] hover:-translate-y-0.5"
             }`}
           >
             <div className="flex items-center gap-3">
@@ -466,16 +466,16 @@ export function CatalogManager() {
 
   return (
     <div className="space-y-8">
-      <section className="panel-card p-6 sm:p-8">
+      <section className="panel-card luxury-section overflow-hidden p-6 sm:p-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
+            <p className="glass-pill inline-flex rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
               White-label
             </p>
-            <h1 className="mt-2 text-3xl font-black uppercase sm:text-4xl">
+            <h1 className="mt-4 text-3xl font-black uppercase tracking-[-0.04em] sm:text-4xl">
               Painel de criacao e edicao do cliente
             </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted)]">
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted)] sm:text-base">
               Organize a implantacao por etapas: primeiro a marca da loja,
               depois produtos e promocoes, e por fim a entrega operacional com
               links e painel da cozinha.
@@ -527,7 +527,7 @@ export function CatalogManager() {
       {activeSection === "overview" ? (
         <div className="space-y-8">
           <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            <article className="panel-card p-5">
+            <article className="panel-card luxury-section p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
                 Produtos
               </p>
@@ -536,7 +536,7 @@ export function CatalogManager() {
                 Itens cadastrados para a loja atual.
               </p>
             </article>
-            <article className="panel-card p-5">
+            <article className="panel-card luxury-section p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
                 Ativos
               </p>
@@ -545,7 +545,7 @@ export function CatalogManager() {
                 Produtos visiveis para o cliente final.
               </p>
             </article>
-            <article className="panel-card p-5">
+            <article className="panel-card luxury-section p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
                 Destaques
               </p>
@@ -554,7 +554,7 @@ export function CatalogManager() {
                 Itens marcados para chamar mais atencao.
               </p>
             </article>
-            <article className="panel-card p-5">
+            <article className="panel-card luxury-section p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
                 Banners
               </p>

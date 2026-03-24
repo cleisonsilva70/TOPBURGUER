@@ -88,16 +88,16 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
 
   return (
     <div className="space-y-8">
-      <header className="panel-card p-6 sm:p-8">
+      <header className="panel-card luxury-section overflow-hidden p-6 sm:p-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
+            <p className="glass-pill inline-flex rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
               Atendimento
             </p>
-            <h1 className="mt-2 text-3xl font-black uppercase">
-              Painel de liberacao de pedidos
+            <h1 className="mt-4 text-3xl font-black uppercase tracking-[-0.04em] sm:text-4xl">
+              Confirmacao de pagamento
             </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--muted)]">
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted)] sm:text-base">
               Aqui ficam apenas os pedidos aguardando pagamento. Quando o atendimento
               marcar como pago, o pedido sai desta tela e entra automaticamente na
               cozinha como novo.
@@ -138,7 +138,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
 
       <section className="grid gap-5 xl:grid-cols-2">
         {orders.length === 0 ? (
-          <div className="panel-card p-8 text-center text-sm text-[var(--muted)] xl:col-span-2">
+          <div className="panel-card luxury-section p-8 text-center text-sm text-[var(--muted)] xl:col-span-2">
             Nenhum pedido aguardando pagamento no momento.
           </div>
         ) : (
@@ -146,7 +146,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
             <article
               key={order.id}
               className={cn(
-                "panel-card relative overflow-hidden p-6",
+                "panel-card luxury-section relative overflow-hidden p-6",
                 loadingId === order.id ? "opacity-75" : "",
               )}
             >
@@ -204,7 +204,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
                   type="button"
                   onClick={() => markAsPaid(order.id)}
                   disabled={loadingId === order.id}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--brand)] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-[var(--brand-strong)] disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)]"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.22)] transition-transform duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)] disabled:shadow-none"
                 >
                   <CheckCircle2 size={18} />
                   {loadingId === order.id ? "Confirmando..." : "Marcar como pago"}

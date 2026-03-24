@@ -219,16 +219,16 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
 
   return (
     <div className="space-y-8">
-      <header className="panel-card p-6 sm:p-8">
+      <header className="panel-card luxury-section overflow-hidden p-6 sm:p-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
+            <p className="glass-pill inline-flex rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
               Operacao
             </p>
-            <h1 className="mt-2 text-3xl font-black uppercase">
+            <h1 className="mt-4 text-3xl font-black uppercase tracking-[-0.04em] sm:text-4xl">
               Painel da cozinha
             </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--muted)]">
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted)] sm:text-base">
               Atualizacao automatica a cada 15 segundos. Esta tela mostra
               apenas pedidos com pagamento confirmado, prontos para entrar na
               operacao da cozinha.
@@ -295,7 +295,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
           {orderStatusSequence.map((status) => (
             <div
               key={status}
-              className="rounded-[30px] border border-[var(--line)] bg-[rgba(255,248,241,0.84)] p-4 shadow-[0_20px_45px_rgba(73,38,18,0.08)]"
+              className="luxury-section rounded-[30px] border border-[var(--line)] bg-[rgba(255,248,241,0.84)] p-4 shadow-[0_20px_45px_rgba(73,38,18,0.08)]"
             >
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
@@ -327,7 +327,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                     <article
                       key={order.id}
                       className={cn(
-                        "relative overflow-hidden rounded-[24px] border bg-white p-4 shadow-[0_12px_30px_rgba(46,23,12,0.06)]",
+                        "luxury-section relative overflow-hidden rounded-[24px] border bg-white p-4 shadow-[0_12px_30px_rgba(46,23,12,0.06)]",
                         isFresh
                           ? "border-[var(--brand)] shadow-[0_0_0_2px_rgba(184,68,31,0.12)]"
                           : isDelayed
@@ -400,9 +400,9 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                               : null
                           }
                           className={cn(
-                            "w-full rounded-full px-4 py-3 text-sm font-bold uppercase tracking-[0.16em] transition-colors",
+                            "w-full rounded-full px-4 py-3 text-sm font-bold uppercase tracking-[0.16em] transition-all",
                             action.nextStatus
-                              ? "bg-[var(--brand)] text-white hover:bg-[var(--brand-strong)]"
+                              ? "bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] text-white shadow-[0_16px_26px_rgba(145,47,18,0.18)] hover:-translate-y-0.5"
                               : "cursor-default bg-[var(--surface-strong)] text-[var(--muted)]",
                           )}
                         >
