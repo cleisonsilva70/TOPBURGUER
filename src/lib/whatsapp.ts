@@ -22,34 +22,40 @@ export function buildOrderMessage(params: {
     )
     .join("\n\n");
 
-  return [
-    `NOVO PEDIDO ( Pedido ndeg ${params.orderNumberFormatted} )`,
-    "",
-    `Horario: ${formatTimeLabel(createdAt)}`,
-    "",
-    "Itens:",
-    itemLines,
-    "",
+  const summaryLines = [
     `Subtotal: ${formatCurrency(params.subtotal)}`,
-    `Entrega: ${formatCurrency(params.deliveryFee)}`,
+    params.deliveryFee > 0 ? `Entrega: ${formatCurrency(params.deliveryFee)}` : "Entrega: sem taxa",
     `Previsao: ${formatDeliveryEstimate(params.estimatedDeliveryMin, params.estimatedDeliveryMax)}`,
     `Total: ${formatCurrency(params.total)}`,
+  ];
+
+  const addressLines = [
+    `${params.checkout.address}, numero ${params.checkout.houseNumber}`,
+    params.checkout.deliveryArea ? `Bairro: ${params.checkout.deliveryArea}` : null,
+    params.checkout.reference ? `Referencia: ${params.checkout.reference}` : null,
+  ].filter((line): line is string => Boolean(line));
+
+  return [
+    `*NOVO PEDIDO*`,
+    `Pedido #${params.orderNumberFormatted}`,
+    `Horario: ${formatTimeLabel(createdAt)}`,
     "",
-    `Cliente: ${params.checkout.customerName}`,
+    `*ITENS*`,
+    itemLines,
+    "",
+    `*RESUMO*`,
+    ...summaryLines,
+    "",
+    `*CLIENTE*`,
+    `Nome: ${params.checkout.customerName}`,
     `Telefone: ${formatPhone(params.checkout.phone)}`,
     "",
-    "Endereco:",
-    `${params.checkout.address}, N ${params.checkout.houseNumber}`,
-    params.checkout.deliveryArea
-      ? `Bairro/Regiao: ${params.checkout.deliveryArea}`
-      : null,
+    `*ENTREGA*`,
+    ...addressLines,
     "",
-    `Referencia: ${params.checkout.reference || "Nao informada"}`,
-    "",
-    `Pagamento: ${paymentLabels[params.checkout.paymentMethod]}`,
-  ]
-    .filter((line): line is string => Boolean(line))
-    .join("\n");
+    `*PAGAMENTO*`,
+    paymentLabels[params.checkout.paymentMethod],
+  ].join("\n");
 }
 
 export function buildWhatsAppUrl(message: string, whatsappNumber: string) {
