@@ -166,24 +166,49 @@ export function PaymentOrderPanel({
 
   return (
     <main className="container-shell py-10 pb-16">
-      <section className="panel-card mx-auto max-w-4xl p-8 sm:p-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
-          Pagamento
-        </p>
-        <h1 className="mt-3 text-4xl font-black uppercase">Pedido {orderNumber}</h1>
-        <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)]">
-          O pedido so entra na cozinha depois do pagamento confirmado.
-        </p>
+      <section className="panel-card luxury-section mx-auto max-w-5xl overflow-hidden p-8 sm:p-10">
+        <div className="grid gap-6 border-b border-[rgba(70,37,17,0.08)] pb-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div>
+            <p className="glass-pill inline-flex rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
+              Pedido {orderNumber}
+            </p>
+            <h1 className="mt-4 text-4xl font-black uppercase tracking-[-0.04em] sm:text-5xl">
+              Acompanhe a confirmacao do seu pedido
+            </h1>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)]">
+              Aqui voce confirma o pagamento e acompanha a liberacao para a equipe da
+              loja. Assim o preparo so comeca quando estiver tudo certo.
+            </p>
+          </div>
+
+          <div className="rounded-[28px] border border-[rgba(34,19,13,0.08)] bg-[var(--surface-dark)] p-5 text-white shadow-[0_18px_34px_rgba(34,19,13,0.18)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/55">
+              Status atual
+            </p>
+            <div className="mt-4 rounded-[22px] border border-white/10 bg-white/8 px-4 py-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/45">
+                Pagamento
+              </p>
+              <p className="mt-2 text-lg font-black uppercase">
+                {paymentState?.paymentStatus ?? "PENDENTE"}
+              </p>
+            </div>
+            <p className="mt-4 text-sm leading-6 text-white/72">
+              Depois da confirmacao, o pedido segue para o atendimento e entra no
+              fluxo interno da loja.
+            </p>
+          </div>
+        </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.95fr]">
-          <div className="rounded-[28px] border border-[var(--line)] bg-white/75 p-6">
+          <div className="panel-subtle rounded-[30px] p-6 sm:p-7">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--brand)] text-white">
                 {paymentMethod === "PIX" ? <QrCode size={22} /> : <CreditCard size={22} />}
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--brand-strong)]">
-                  Metodo
+                  Forma de pagamento
                 </p>
                 <h2 className="mt-1 text-2xl font-black uppercase">
                   {paymentLabels[paymentMethod]}
@@ -197,7 +222,7 @@ export function PaymentOrderPanel({
 
             <div className="mt-6 rounded-[24px] border border-[var(--line)] bg-[var(--surface-strong)] p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--brand-strong)]">
-                {isHostedProvider ? "Status do pagamento" : "Codigo de pagamento"}
+                {isHostedProvider ? "Status do pagamento" : "Codigo para confirmar"}
               </p>
               <div className="mt-3 rounded-[20px] bg-white p-4 text-sm font-semibold leading-7 text-[var(--foreground)] break-all">
                 {isHostedProvider
@@ -207,16 +232,16 @@ export function PaymentOrderPanel({
             </div>
           </div>
 
-          <div className="rounded-[28px] border border-[var(--line)] bg-[var(--foreground)] p-6 text-white">
+          <div className="rounded-[30px] border border-[var(--line)] bg-[linear-gradient(180deg,var(--surface-dark),#1b100b)] p-6 text-white sm:p-7">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
-              Liberacao da cozinha
+              Fluxo da loja
             </p>
             <h2 className="mt-3 text-2xl font-black uppercase">
-              Cozinha so recebe pedido pago
+              O preparo so comeca depois da confirmacao
             </h2>
             <p className="mt-4 text-sm leading-7 text-white/72">
-              Assim a operacao trabalha apenas com pedido confirmado. Depois do
-              pagamento, o pedido entra como novo no painel da cozinha.
+              Assim a loja trabalha apenas com pedido confirmado. Depois do
+              pagamento, o atendimento libera e a cozinha recebe como novo.
             </p>
 
             <div className="mt-6 rounded-[22px] bg-white/8 p-4 text-sm leading-7 text-white/78">
@@ -258,17 +283,17 @@ export function PaymentOrderPanel({
                 <a
                   href={paymentState.paymentLink}
                   target="_self"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--brand)] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-[var(--brand-strong)]"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.22)] transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   <ExternalLink size={18} />
-                  Abrir pagina de pagamento
+                  Abrir pagamento
                 </a>
               ) : null}
               <button
                 type="button"
                 onClick={() => void refreshPaymentStatus(true)}
                 disabled={isRefreshing}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--line)] bg-white/70 px-6 py-4 text-sm font-bold uppercase tracking-[0.16em]"
+                className="glass-pill inline-flex items-center justify-center gap-2 rounded-full px-6 py-4 text-sm font-bold uppercase tracking-[0.16em]"
               >
                 {isRefreshing ? <LoaderCircle className="animate-spin" size={18} /> : <RefreshCcw size={18} />}
                 Atualizar status
@@ -279,7 +304,7 @@ export function PaymentOrderPanel({
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(26,132,76,0.24)] bg-[rgba(26,132,76,0.1)] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-[var(--success)]"
                 >
                   <CheckCircle2 size={18} />
-                  Abrir WhatsApp
+                  Ir para o WhatsApp
                 </a>
               ) : null}
             </>
@@ -288,7 +313,7 @@ export function PaymentOrderPanel({
               type="button"
               onClick={handleConfirmPayment}
               disabled={isConfirming}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--brand)] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-[var(--brand-strong)] disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)]"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.22)] transition-transform duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)] disabled:shadow-none"
             >
               <MessageCircleMore size={18} />
               {isConfirming ? "Confirmando pagamento..." : instructions.cta}
@@ -296,9 +321,9 @@ export function PaymentOrderPanel({
           )}
           <Link
             href="/checkout"
-            className="inline-flex items-center justify-center rounded-full border border-[var(--line)] bg-white/70 px-6 py-4 text-sm font-bold uppercase tracking-[0.16em]"
+            className="glass-pill inline-flex items-center justify-center rounded-full px-6 py-4 text-sm font-bold uppercase tracking-[0.16em]"
           >
-            Voltar ao checkout
+            Voltar ao pedido
           </Link>
         </div>
       </section>

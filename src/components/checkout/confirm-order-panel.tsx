@@ -114,7 +114,7 @@ export function ConfirmOrderPanel() {
   if (loading) {
     return (
       <section className="panel-card luxury-section mx-auto max-w-3xl p-8 sm:p-10">
-        <p className="text-sm text-[var(--muted)]">Carregando confirmacao do pedido...</p>
+        <p className="text-sm text-[var(--muted)]">Carregando a revisao do seu pedido...</p>
       </section>
     );
   }
@@ -127,12 +127,12 @@ export function ConfirmOrderPanel() {
         </p>
         <h1 className="mt-3 text-4xl font-black uppercase">Pedido nao encontrado</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--muted)]">
-          Volte ao checkout e prepare o pedido novamente antes de confirmar no WhatsApp.
+          Volte ao checkout e monte seu pedido novamente antes de enviar para a loja.
         </p>
         <div className="mt-8">
           <Link
             href="/checkout"
-            className="inline-flex items-center justify-center rounded-full border border-[var(--line)] bg-white/70 px-6 py-4 text-sm font-bold uppercase tracking-[0.16em]"
+            className="glass-pill inline-flex items-center justify-center rounded-full px-6 py-4 text-sm font-bold uppercase tracking-[0.16em]"
           >
             Voltar ao checkout
           </Link>
@@ -146,21 +146,21 @@ export function ConfirmOrderPanel() {
       <div className="grid gap-6 border-b border-[rgba(70,37,17,0.08)] pb-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
         <div>
           <span className="glass-pill inline-flex rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
-            Confirmacao final
+            Revisao final
           </span>
           <h1 className="mt-4 text-4xl font-black uppercase tracking-[-0.04em] sm:text-5xl">
-            Revisar e enviar o pedido para a loja
+            Confira tudo antes de enviar para a loja
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)] sm:text-[1.02rem]">
             Assim que voce confirmar, o pedido segue para o WhatsApp da loja e entra
             no atendimento. A cozinha so recebe depois que o pagamento for marcado
-            como confirmado pela operacao.
+            como confirmado pela equipe.
           </p>
         </div>
 
         <div className="rounded-[28px] border border-[rgba(34,19,13,0.08)] bg-[var(--surface-dark)] p-5 text-white shadow-[0_18px_34px_rgba(34,19,13,0.18)]">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/55">
-            Fluxo do pedido
+            O que acontece depois
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
             {[
@@ -263,7 +263,7 @@ export function ConfirmOrderPanel() {
           onClick={() => router.push("/checkout")}
           className="glass-pill inline-flex items-center justify-center rounded-full px-6 py-4 text-sm font-bold uppercase tracking-[0.16em]"
         >
-          Voltar e revisar
+          Voltar e ajustar
         </button>
       </div>
     </section>

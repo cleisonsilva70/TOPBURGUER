@@ -156,31 +156,41 @@ export function CheckoutForm({
 
   return (
     <section className="grid gap-8 xl:grid-cols-[1.15fr_0.85fr] xl:items-start">
-      <form onSubmit={handleSubmit} className="panel-card p-6 sm:p-8">
+      <form onSubmit={handleSubmit} className="panel-card luxury-section p-6 sm:p-8">
         <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
-            Checkout
+          <p className="glass-pill inline-flex rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
+            Entrega e contato
           </p>
-          <h1 className="mt-2 text-3xl font-black uppercase">Entrega e pagamento</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">
-            Preencha os dados para preparar o pedido, seguir para o pagamento e so depois liberar a cozinha e o WhatsApp da hamburgueria.
+          <h1 className="mt-4 text-3xl font-black uppercase tracking-[-0.04em]">
+            Onde vamos levar seu pedido?
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)] sm:text-base">
+            Preencha seus dados para a loja receber tudo certinho, sem atraso e sem
+            precisar te chamar de novo no WhatsApp.
           </p>
-          <p className="glass-pill mt-3 inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
-            Entrega: {formatCurrency(activeDeliveryFee)} | Previsao:{" "}
-            {formatDeliveryEstimate(
-              activeEstimatedDeliveryMin,
-              activeEstimatedDeliveryMax,
-            )}
-          </p>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <p className="glass-pill inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
+              Entrega {formatCurrency(activeDeliveryFee)}
+            </p>
+            <p className="glass-pill inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
+              Previsao{" "}
+              {formatDeliveryEstimate(
+                activeEstimatedDeliveryMin,
+                activeEstimatedDeliveryMax,
+              )}
+            </p>
+          </div>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="space-y-2 sm:col-span-2">
-            <span className="text-sm font-semibold">Nome</span>
+            <span className="text-sm font-semibold">Seu nome</span>
             <input
               required
               value={formData.customerName}
               onChange={(event) => updateField("customerName", event.target.value)}
+              placeholder="Como a loja deve te chamar"
               className={`w-full rounded-2xl border bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
                 fieldErrors.customerName
                   ? "border-[var(--danger)]"
@@ -193,7 +203,7 @@ export function CheckoutForm({
           </label>
 
           <label className="space-y-2">
-            <span className="text-sm font-semibold">Telefone</span>
+            <span className="text-sm font-semibold">WhatsApp para contato</span>
             <input
               required
               inputMode="tel"
@@ -244,7 +254,7 @@ export function CheckoutForm({
           ) : null}
 
           <label className="space-y-2">
-            <span className="text-sm font-semibold">Forma de pagamento</span>
+            <span className="text-sm font-semibold">Como voce vai pagar?</span>
             <select
               value={formData.paymentMethod}
               onChange={(event) =>
@@ -261,11 +271,12 @@ export function CheckoutForm({
           </label>
 
           <label className="space-y-2 sm:col-span-2">
-            <span className="text-sm font-semibold">Endereco</span>
+            <span className="text-sm font-semibold">Rua ou avenida</span>
             <input
               required
               value={formData.address}
               onChange={(event) => updateField("address", event.target.value)}
+              placeholder="Ex.: Rua das Flores"
               className={`w-full rounded-2xl border bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
                 fieldErrors.address
                   ? "border-[var(--danger)]"
@@ -278,11 +289,12 @@ export function CheckoutForm({
           </label>
 
           <label className="space-y-2">
-            <span className="text-sm font-semibold">Numero da casa</span>
+            <span className="text-sm font-semibold">Numero</span>
             <input
               required
               value={formData.houseNumber}
               onChange={(event) => updateField("houseNumber", event.target.value)}
+              placeholder="Ex.: 175"
               className={`w-full rounded-2xl border bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
                 fieldErrors.houseNumber
                   ? "border-[var(--danger)]"
@@ -299,6 +311,7 @@ export function CheckoutForm({
             <input
               value={formData.reference}
               onChange={(event) => updateField("reference", event.target.value)}
+              placeholder="Ex.: Casa de esquina, portao preto"
               className="w-full rounded-2xl border border-[var(--line)] bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)]"
             />
           </label>
@@ -310,23 +323,31 @@ export function CheckoutForm({
           </p>
         ) : null}
 
-        <button
-          type="submit"
-          disabled={isSubmitting || items.length === 0}
-          className="mt-8 inline-flex min-h-12 rounded-full bg-[var(--brand)] px-6 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-[var(--brand-strong)] disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)]"
-        >
-          {isSubmitting ? "Preparando..." : "Continuar para confirmar"}
-        </button>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm leading-6 text-[var(--muted)]">
+            Depois voce ainda revisa tudo antes de enviar para a loja.
+          </p>
+          <button
+            type="submit"
+            disabled={isSubmitting || items.length === 0}
+            className="inline-flex min-h-12 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.2)] transition-transform duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)] disabled:shadow-none"
+          >
+            {isSubmitting ? "Preparando..." : "Revisar pedido"}
+          </button>
+        </div>
       </form>
 
-      <aside className="panel-card p-6 sm:p-8 xl:sticky xl:top-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
+      <aside className="panel-card luxury-section p-6 sm:p-8 xl:sticky xl:top-6">
+        <p className="glass-pill inline-flex rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
           Resumo
         </p>
+        <h2 className="mt-4 text-2xl font-black uppercase tracking-[-0.03em]">
+          Seu pedido ate aqui
+        </h2>
         <div className="mt-5 space-y-4">
           {items.length === 0 ? (
             <div className="panel-subtle border-dashed p-5 text-sm text-[var(--muted)]">
-              Seu carrinho esta vazio.
+              Seu carrinho esta vazio no momento.
             </div>
           ) : (
             items.map((item) => (
@@ -373,6 +394,10 @@ export function CheckoutForm({
             <span>{formatCurrency(total)}</span>
           </div>
         </div>
+
+        <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
+          O atendimento confere o pagamento e libera o pedido para a cozinha.
+        </p>
       </aside>
     </section>
   );
