@@ -12,7 +12,8 @@ type ProductCardProps = {
 
 export function ProductCard({ product, onAdd }: ProductCardProps) {
   return (
-    <article className="group overflow-hidden rounded-[28px] border border-[var(--line)] bg-[rgba(255,248,240,0.88)] shadow-[0_20px_45px_rgba(80,41,21,0.12)] transition-transform duration-300 hover:-translate-y-1">
+    <article className="group relative overflow-hidden rounded-[30px] border border-[var(--line)] bg-[linear-gradient(180deg,rgba(255,250,243,0.96),rgba(255,243,230,0.92))] shadow-[0_24px_52px_rgba(80,41,21,0.12)] transition-transform duration-300 hover:-translate-y-1.5">
+      <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-[color-mix(in_srgb,var(--accent)_26%,transparent)] blur-3xl" />
       <div className="relative h-48 overflow-hidden sm:h-52">
         <Image
           src={product.imageUrl}
@@ -28,9 +29,9 @@ export function ProductCard({ product, onAdd }: ProductCardProps) {
         ) : null}
       </div>
 
-      <div className="space-y-4 p-5">
+      <div className="relative z-10 space-y-4 p-5">
         <div className="space-y-2">
-          <h3 className="text-xl font-black text-[var(--foreground)]">
+          <h3 className="text-xl font-black uppercase text-[var(--foreground)]">
             {product.name}
           </h3>
           <p className="min-h-14 text-sm leading-6 text-[var(--muted)]">
@@ -38,7 +39,7 @@ export function ProductCard({ product, onAdd }: ProductCardProps) {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-wrap items-end justify-between gap-4 border-t border-[rgba(70,37,17,0.08)] pt-4">
           <div>
             <span className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
               A partir de

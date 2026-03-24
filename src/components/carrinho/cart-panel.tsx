@@ -20,13 +20,13 @@ export function CartPanel() {
           </p>
           <h3 className="mt-2 text-2xl font-black">Seu pedido</h3>
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--foreground)] text-white">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,rgba(35,21,15,0.96),rgba(57,31,21,0.92))] text-white shadow-[0_18px_36px_rgba(35,21,15,0.18)]">
           <ShoppingBag size={20} />
         </div>
       </div>
 
       {items.length === 0 ? (
-        <div className="mt-6 rounded-[22px] border border-dashed border-[var(--line)] bg-white/55 p-5 text-sm leading-6 text-[var(--muted)]">
+        <div className="panel-subtle mt-6 border-dashed p-5 text-sm leading-6 text-[var(--muted)]">
           Adicione burgers, combos e bebidas para montar o pedido.
         </div>
       ) : (
@@ -34,7 +34,7 @@ export function CartPanel() {
           {items.map((item) => (
             <div
               key={item.id}
-              className="rounded-[22px] border border-[var(--line)] bg-white/75 p-4"
+              className="panel-subtle p-4"
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -54,7 +54,7 @@ export function CartPanel() {
               </div>
 
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)] px-2 py-2">
+                <div className="glass-pill inline-flex items-center gap-2 rounded-full px-2 py-2">
                   <button
                     type="button"
                     onClick={() => decreaseItem(item.id)}
@@ -82,7 +82,7 @@ export function CartPanel() {
         </div>
       )}
 
-      <div className="mt-6 rounded-[22px] bg-[var(--foreground)] p-5 text-white">
+      <div className="mt-6 rounded-[24px] bg-[linear-gradient(180deg,rgba(35,21,15,0.98),rgba(57,31,21,0.92))] p-5 text-white shadow-[0_22px_50px_rgba(35,21,15,0.22)]">
         <div className="flex items-center justify-between text-sm text-white/75">
           <span>Itens</span>
           <span>{itemCount}</span>

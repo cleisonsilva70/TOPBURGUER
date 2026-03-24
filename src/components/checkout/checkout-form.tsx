@@ -165,7 +165,7 @@ export function CheckoutForm({
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">
             Preencha os dados para preparar o pedido, seguir para o pagamento e so depois liberar a cozinha e o WhatsApp da hamburgueria.
           </p>
-          <p className="mt-3 inline-flex rounded-full bg-[var(--surface-strong)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
+          <p className="glass-pill mt-3 inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
             Entrega: {formatCurrency(activeDeliveryFee)} | Previsao:{" "}
             {formatDeliveryEstimate(
               activeEstimatedDeliveryMin,
@@ -181,7 +181,7 @@ export function CheckoutForm({
               required
               value={formData.customerName}
               onChange={(event) => updateField("customerName", event.target.value)}
-              className={`w-full rounded-2xl border bg-white px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
+              className={`w-full rounded-2xl border bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
                 fieldErrors.customerName
                   ? "border-[var(--danger)]"
                   : "border-[var(--line)]"
@@ -200,7 +200,7 @@ export function CheckoutForm({
               placeholder="(84) 99999-9999"
               value={formData.phone}
               onChange={(event) => updateField("phone", formatPhone(event.target.value))}
-              className={`w-full rounded-2xl border bg-white px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
+              className={`w-full rounded-2xl border bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
                 fieldErrors.phone ? "border-[var(--danger)]" : "border-[var(--line)]"
               }`}
             />
@@ -216,7 +216,7 @@ export function CheckoutForm({
                 required
                 value={formData.deliveryArea}
                 onChange={(event) => updateField("deliveryArea", event.target.value)}
-                className={`w-full rounded-2xl border bg-white px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
+                className={`w-full rounded-2xl border bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
                   fieldErrors.deliveryArea
                     ? "border-[var(--danger)]"
                     : "border-[var(--line)]"
@@ -250,7 +250,7 @@ export function CheckoutForm({
               onChange={(event) =>
                 updateField("paymentMethod", event.target.value as PaymentMethod)
               }
-              className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3 outline-none transition-colors focus:border-[var(--brand)]"
+              className="w-full rounded-2xl border border-[var(--line)] bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)]"
             >
               {paymentOptions.map((option) => (
                 <option key={option} value={option}>
@@ -266,7 +266,7 @@ export function CheckoutForm({
               required
               value={formData.address}
               onChange={(event) => updateField("address", event.target.value)}
-              className={`w-full rounded-2xl border bg-white px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
+              className={`w-full rounded-2xl border bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
                 fieldErrors.address
                   ? "border-[var(--danger)]"
                   : "border-[var(--line)]"
@@ -283,7 +283,7 @@ export function CheckoutForm({
               required
               value={formData.houseNumber}
               onChange={(event) => updateField("houseNumber", event.target.value)}
-              className={`w-full rounded-2xl border bg-white px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
+              className={`w-full rounded-2xl border bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
                 fieldErrors.houseNumber
                   ? "border-[var(--danger)]"
                   : "border-[var(--line)]"
@@ -299,7 +299,7 @@ export function CheckoutForm({
             <input
               value={formData.reference}
               onChange={(event) => updateField("reference", event.target.value)}
-              className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3 outline-none transition-colors focus:border-[var(--brand)]"
+              className="w-full rounded-2xl border border-[var(--line)] bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)]"
             />
           </label>
         </div>
@@ -325,14 +325,14 @@ export function CheckoutForm({
         </p>
         <div className="mt-5 space-y-4">
           {items.length === 0 ? (
-            <div className="rounded-[22px] border border-dashed border-[var(--line)] bg-white/55 p-5 text-sm text-[var(--muted)]">
+            <div className="panel-subtle border-dashed p-5 text-sm text-[var(--muted)]">
               Seu carrinho esta vazio.
             </div>
           ) : (
             items.map((item) => (
               <div
                 key={item.id}
-                className="rounded-[22px] border border-[var(--line)] bg-white/75 p-4"
+                className="panel-subtle p-4"
               >
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
@@ -350,7 +350,7 @@ export function CheckoutForm({
           )}
         </div>
 
-        <div className="mt-6 rounded-[24px] bg-[var(--foreground)] p-5 text-white">
+        <div className="mt-6 rounded-[24px] bg-[linear-gradient(180deg,rgba(35,21,15,0.98),rgba(57,31,21,0.92))] p-5 text-white shadow-[0_22px_50px_rgba(35,21,15,0.22)]">
           <div className="flex justify-between text-sm text-white/70">
             <span>Subtotal</span>
             <span>{formatCurrency(subtotal)}</span>
