@@ -104,7 +104,7 @@ export async function createHostedPaymentSession(
   const customerId = await createAsaasCustomer(params.checkout);
   const returnUrl = `${appBaseUrl}/pedido/${encodeURIComponent(params.orderNumberFormatted)}`;
 
-  const response = await fetch(`${getAsaasBaseUrl()}/v3/payments`, {
+  const response = await fetch(`${getAsaasBaseUrl()}/v3/lean/payments`, {
     method: "POST",
     headers: {
       access_token: process.env.ASAAS_API_KEY ?? "",
