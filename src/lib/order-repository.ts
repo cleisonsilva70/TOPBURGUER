@@ -375,7 +375,6 @@ async function attachHostedPaymentIfAvailable(params: {
     items: params.items,
     deliveryFee: params.deliveryFee,
     total: Number(params.order.total),
-    whatsappUrl: params.whatsappUrl,
   });
 
   if (!hostedPayment) {
@@ -963,4 +962,57 @@ export async function getPublicOrderPaymentStatus(id: string) {
   }
 
   return order;
+}
+
+export async function getPublicOrderPaymentContextByNumber(orderNumberFormatted: string) {
+  if (!canUseDatabase()) {
+    const order = memoryOrders.find(
+      (entry) => entry.orderNumberFormatted === orderNumberFormatted,
+    );
+
+    if (!order) {
+      throw new OrderFlowError("Pedido nao encontrado.", 404);
+    }
+
+    const currentStoreConfig = await getResolvedStoreConfig();
+
+    return {
+      id: order.id,
+      orderNumberFormatted: order.orderNumberFormatted,
+      paymentMethod: order.paymentMethod,
+      paymentStatus: order.paymentStatus,
+      paymentProvider: order.paymentProvider,
+      paymentLink: order.paymentLink,
+      whatsappUrl: buildWhatsAppUrl(order.orderText, currentStoreConfig.whatsappNumber),
+    };
+  }
+
+  const order = await prisma.order.findUnique({
+    where: { orderNumberFormatted },
+    select: {
+      id: true,
+      orderNumberFormatted: true,
+      paymentMethod: true,
+      paymentStatus: true,
+      paymentProvider: true,
+      paymentLink: true,
+      orderText: true,
+    },
+  });
+
+  if (!order) {
+    throw new OrderFlowError("Pedido nao encontrado.", 404);
+  }
+
+  const currentStoreConfig = await getResolvedStoreConfig();
+
+  return {
+    id: order.id,
+    orderNumberFormatted: order.orderNumberFormatted,
+    paymentMethod: order.paymentMethod,
+    paymentStatus: order.paymentStatus,
+    paymentProvider: order.paymentProvider,
+    paymentLink: order.paymentLink,
+    whatsappUrl: buildWhatsAppUrl(order.orderText, currentStoreConfig.whatsappNumber),
+  };
 }

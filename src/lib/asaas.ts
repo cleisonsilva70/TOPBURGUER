@@ -14,7 +14,6 @@ type CreateHostedPaymentParams = {
   items: CartItem[];
   deliveryFee: number;
   total: number;
-  whatsappUrl: string;
 };
 
 function getAsaasBaseUrl() {
@@ -57,7 +56,7 @@ export async function createHostedPaymentSession(
     return null;
   }
 
-  const callbackBase = `${appBaseUrl}/pedido/${encodeURIComponent(params.orderNumberFormatted)}?orderId=${encodeURIComponent(params.orderId)}&provider=ASAAS&paymentMethod=${encodeURIComponent(params.checkout.paymentMethod)}&whatsapp=${encodeURIComponent(params.whatsappUrl)}`;
+  const callbackBase = `${appBaseUrl}/pedido/${encodeURIComponent(params.orderNumberFormatted)}`;
 
   const response = await fetch(`${getAsaasBaseUrl()}/v3/checkouts`, {
     method: "POST",
@@ -70,9 +69,9 @@ export async function createHostedPaymentSession(
       chargeTypes: ["DETACHED"],
       minutesToExpire: 60,
       callback: {
-        successUrl: `${callbackBase}&status=success`,
-        cancelUrl: `${callbackBase}&status=cancelled`,
-        expiredUrl: `${callbackBase}&status=expired`,
+        successUrl: callbackBase,
+        cancelUrl: callbackBase,
+        expiredUrl: callbackBase,
       },
       items: [
         ...params.items.map((item) => ({

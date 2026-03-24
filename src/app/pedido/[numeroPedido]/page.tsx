@@ -1,4 +1,5 @@
 import { PaymentOrderPanel } from "@/components/checkout/payment-order-panel";
+import { getPublicOrderPaymentContextByNumber } from "@/lib/order-repository";
 
 type PedidoPageProps = {
   params: Promise<{ numeroPedido: string }>;
@@ -21,15 +22,16 @@ export default async function PedidoPage({
   const { numeroPedido } = await params;
   const { orderId, whatsapp, paymentMethod, paymentCode, provider, status } =
     await searchParams;
+  const paymentContext = await getPublicOrderPaymentContextByNumber(numeroPedido);
 
   return (
     <PaymentOrderPanel
-      orderId={orderId}
+      orderId={orderId ?? paymentContext.id}
       orderNumber={numeroPedido}
-      whatsappUrl={whatsapp}
-      paymentMethod={paymentMethod}
+      whatsappUrl={whatsapp ?? paymentContext.whatsappUrl}
+      paymentMethod={paymentMethod ?? paymentContext.paymentMethod}
       paymentCode={paymentCode}
-      paymentProvider={provider}
+      paymentProvider={provider ?? paymentContext.paymentProvider ?? undefined}
       gatewayStatus={status}
     />
   );
