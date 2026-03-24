@@ -203,7 +203,7 @@ function StatusNotice({
   }
 
   return (
-    <section className="panel-card p-5">
+    <section className="panel-card luxury-section p-5">
       {error ? (
         <p className="rounded-2xl border border-[rgba(179,63,47,0.22)] bg-[rgba(179,63,47,0.08)] px-4 py-3 text-sm text-[var(--danger)]">
           {error}
@@ -488,13 +488,13 @@ export function CatalogManager() {
   return (
     <div className="space-y-8">
       <section className="panel-card luxury-section overflow-hidden p-6 sm:p-8">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div>
             <p className="glass-pill inline-flex rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
               White-label
             </p>
             <h1 className="mt-4 text-3xl font-black uppercase tracking-[-0.04em] sm:text-4xl">
-              Painel de criacao e edicao do cliente
+              Central de implantacao e gestao da loja
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted)] sm:text-base">
               Organize a implantacao por etapas: primeiro a marca da loja,
@@ -517,27 +517,43 @@ export function CatalogManager() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/"
-              target="_blank"
-              className="glass-pill inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em]"
-            >
-              Ver vitrine
-              <ExternalLink size={16} />
-            </Link>
-            <Link
-              href="/atendimento"
-              className="glass-pill inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em]"
-            >
-              Abrir atendimento
-            </Link>
-            <Link
-              href="/cozinha"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,rgba(35,21,15,0.96),rgba(57,31,21,0.92))] px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white shadow-[0_18px_38px_rgba(35,21,15,0.18)]"
-            >
-              Abrir cozinha
-            </Link>
+          <div className="rounded-[28px] border border-[rgba(34,19,13,0.08)] bg-[linear-gradient(180deg,var(--surface-dark),#1b100b)] p-5 text-white shadow-[0_20px_38px_rgba(34,19,13,0.18)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/55">
+              Acesso rapido
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+              <Link
+                href="/"
+                target="_blank"
+                className="rounded-[22px] border border-white/10 bg-white/8 px-4 py-4 transition-colors hover:bg-white/12"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/45">
+                  Vitrine
+                </p>
+                <div className="mt-2 flex items-center justify-between gap-3">
+                  <span className="text-sm font-bold uppercase">Ver loja</span>
+                  <ExternalLink size={16} />
+                </div>
+              </Link>
+              <Link
+                href="/atendimento"
+                className="rounded-[22px] border border-white/10 bg-white/8 px-4 py-4 transition-colors hover:bg-white/12"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/45">
+                  Atendimento
+                </p>
+                <p className="mt-2 text-sm font-bold uppercase">Liberar pedidos</p>
+              </Link>
+              <Link
+                href="/cozinha"
+                className="rounded-[22px] border border-white/10 bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-4 py-4 shadow-[0_16px_26px_rgba(145,47,18,0.2)]"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/55">
+                  Cozinha
+                </p>
+                <p className="mt-2 text-sm font-bold uppercase">Abrir operacao</p>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -553,8 +569,8 @@ export function CatalogManager() {
                 Produtos
               </p>
               <p className="mt-4 text-4xl font-black">{products.length}</p>
-              <p className="mt-2 text-sm text-[var(--muted)]">
-                Itens cadastrados para a loja atual.
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                Itens cadastrados no cardapio desta hamburgueria.
               </p>
             </article>
             <article className="panel-card luxury-section p-5">
@@ -562,8 +578,8 @@ export function CatalogManager() {
                 Ativos
               </p>
               <p className="mt-4 text-4xl font-black">{activeProductsCount}</p>
-              <p className="mt-2 text-sm text-[var(--muted)]">
-                Produtos visiveis para o cliente final.
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                Produtos publicados e visiveis para o cliente final.
               </p>
             </article>
             <article className="panel-card luxury-section p-5">
@@ -571,8 +587,8 @@ export function CatalogManager() {
                 Destaques
               </p>
               <p className="mt-4 text-4xl font-black">{featuredProductsCount}</p>
-              <p className="mt-2 text-sm text-[var(--muted)]">
-                Itens marcados para chamar mais atencao.
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                Itens destacados para puxar mais cliques e vendas.
               </p>
             </article>
             <article className="panel-card luxury-section p-5">
@@ -580,11 +596,11 @@ export function CatalogManager() {
                 Banners
               </p>
               <p className="mt-4 text-4xl font-black">{activeBannersCount}</p>
-              <p className="mt-2 text-sm text-[var(--muted)]">
-                Promocoes ativas na vitrine principal.
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                Banners ativos na vitrine principal da loja.
               </p>
             </article>
-            <article className="panel-card p-5 md:col-span-2 xl:col-span-4">
+            <article className="panel-card luxury-section p-5 md:col-span-2 xl:col-span-4">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
@@ -616,7 +632,7 @@ export function CatalogManager() {
           </section>
 
           <div className="grid gap-8 xl:grid-cols-[1fr_0.95fr]">
-            <section className="panel-card p-6 sm:p-8">
+            <section className="panel-card luxury-section p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
                 Passo a passo
               </p>
@@ -644,7 +660,7 @@ export function CatalogManager() {
               </div>
             </section>
 
-            <section className="panel-card p-6 sm:p-8">
+            <section className="panel-card luxury-section p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
                 Loja atual
               </p>
@@ -691,7 +707,7 @@ export function CatalogManager() {
       ) : null}
 
       {activeSection === "store" ? (
-        <section className="panel-card p-6 sm:p-8">
+        <section className="panel-card luxury-section p-6 sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
             Loja e marca
           </p>
@@ -1056,7 +1072,7 @@ export function CatalogManager() {
 
       {activeSection === "products" ? (
         <div className="grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
-          <section className="panel-card p-6 sm:p-8">
+          <section className="panel-card luxury-section p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
               Cadastro
             </p>
@@ -1199,7 +1215,7 @@ export function CatalogManager() {
             </form>
           </section>
 
-          <section className="panel-card p-6 sm:p-8">
+          <section className="panel-card luxury-section p-6 sm:p-8">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
@@ -1281,7 +1297,7 @@ export function CatalogManager() {
 
       {activeSection === "banners" ? (
         <div className="grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
-          <section className="panel-card p-6 sm:p-8">
+          <section className="panel-card luxury-section p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
               Promocoes
             </p>
@@ -1376,7 +1392,7 @@ export function CatalogManager() {
             </form>
           </section>
 
-          <section className="panel-card p-6 sm:p-8">
+          <section className="panel-card luxury-section p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
               Vitrine
             </p>
@@ -1429,7 +1445,7 @@ export function CatalogManager() {
 
       {activeSection === "operation" ? (
         <div className="grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
-          <section className="panel-card p-6 sm:p-8">
+          <section className="panel-card luxury-section p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
               Entrega
             </p>
@@ -1453,7 +1469,7 @@ export function CatalogManager() {
             </div>
           </section>
 
-          <section className="panel-card p-6 sm:p-8">
+          <section className="panel-card luxury-section p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
               Links
             </p>
@@ -1509,7 +1525,7 @@ export function CatalogManager() {
             </div>
           </section>
 
-          <section className="panel-card p-6 sm:p-8 xl:col-span-2">
+          <section className="panel-card luxury-section p-6 sm:p-8 xl:col-span-2">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
