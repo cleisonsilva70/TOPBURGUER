@@ -440,7 +440,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                         </strong>
                       </div>
 
-                      <div className="mt-4 space-y-3">
+                      <div className="mt-4">
                         <button
                           type="button"
                           disabled={!action.nextStatus || loadingId === order.id}
@@ -460,25 +460,6 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                             ? "Atualizando..."
                             : action.label}
                         </button>
-
-                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                          {orderStatusSequence.map((step) => (
-                            <button
-                              key={step}
-                              type="button"
-                              onClick={() => changeStatus(order.id, step)}
-                              disabled={loadingId === order.id}
-                              className={cn(
-                                "min-h-12 rounded-2xl border px-2 py-2 text-[10px] font-bold uppercase leading-4 tracking-[0.08em] transition-colors",
-                                order.status === step
-                                  ? "border-[var(--brand)] bg-[var(--brand)] text-white"
-                                  : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--brand)] hover:text-[var(--brand)]",
-                              )}
-                            >
-                              {step === "EM_PREPARO" ? "Preparo" : orderStatusLabels[step]}
-                            </button>
-                          ))}
-                        </div>
                       </div>
                     </article>
                   );
