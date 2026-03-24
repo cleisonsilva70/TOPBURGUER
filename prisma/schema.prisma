@@ -83,20 +83,24 @@ model StoreSettings {
 }
 
 model StoreBanner {
-  id          String   @id @default(cuid())
-  storeId     String
-  title       String
-  description String
-  imageUrl    String
-  ctaLabel    String
-  ctaHref     String?
-  ctaMode     String   @default("LINK")
-  ctaProductId String?
-  active      Boolean  @default(true)
-  displayOrder Int     @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  id            String   @id @default(cuid())
+  storeId       String
+  title         String
+  description   String
+  imageUrl      String
+  ctaLabel      String
+  ctaHref       String?
+  ctaMode       String   @default("LINK")
+  ctaProductId  String?
+  campaignBadge String?
+  highlighted   Boolean  @default(false)
+  startsAt      DateTime?
+  endsAt        DateTime?
+  active        Boolean  @default(true)
+  displayOrder  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  store         Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 
 model Product {

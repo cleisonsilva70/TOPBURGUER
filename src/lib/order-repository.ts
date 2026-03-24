@@ -843,6 +843,10 @@ export async function getAdminStoreConfiguration() {
       ctaHref: banner.ctaHref ?? "#cardapio",
       ctaMode: (banner.ctaMode as "LINK" | "ADD_TO_CART" | undefined) ?? "LINK",
       ctaProductId: banner.ctaProductId ?? "",
+      campaignBadge: banner.campaignBadge ?? "",
+      highlighted: banner.highlighted,
+      startsAt: banner.startsAt?.toISOString() ?? "",
+      endsAt: banner.endsAt?.toISOString() ?? "",
       active: banner.active,
       displayOrder: banner.displayOrder,
     })),
@@ -927,6 +931,11 @@ export async function upsertAdminBanner(input: {
   ctaMode?: "LINK" | "ADD_TO_CART";
   ctaHref?: string;
   ctaProductId?: string;
+  campaignBadge?: string;
+  highlighted?: boolean;
+  startsAt?: string;
+  endsAt?: string;
+  displayOrder?: number;
   active: boolean;
 }) {
   const storeId = await getCurrentStoreId();
@@ -953,6 +962,11 @@ export async function upsertAdminBanner(input: {
           ctaMode: input.ctaMode ?? "LINK",
           ctaHref: input.ctaHref || "#cardapio",
           ctaProductId: input.ctaMode === "ADD_TO_CART" ? input.ctaProductId || null : null,
+          campaignBadge: input.campaignBadge?.trim() || null,
+          highlighted: input.highlighted ?? false,
+          startsAt: input.startsAt ? new Date(input.startsAt) : null,
+          endsAt: input.endsAt ? new Date(input.endsAt) : null,
+          displayOrder: input.displayOrder ?? 0,
           active: input.active,
         },
       })
@@ -966,8 +980,12 @@ export async function upsertAdminBanner(input: {
           ctaMode: input.ctaMode ?? "LINK",
           ctaHref: input.ctaHref || "#cardapio",
           ctaProductId: input.ctaMode === "ADD_TO_CART" ? input.ctaProductId || null : null,
+          campaignBadge: input.campaignBadge?.trim() || null,
+          highlighted: input.highlighted ?? false,
+          startsAt: input.startsAt ? new Date(input.startsAt) : null,
+          endsAt: input.endsAt ? new Date(input.endsAt) : null,
           active: input.active,
-          displayOrder: displayOrder + 1,
+          displayOrder: input.displayOrder ?? displayOrder + 1,
         },
       });
 
@@ -980,6 +998,10 @@ export async function upsertAdminBanner(input: {
     ctaHref: banner.ctaHref ?? "#cardapio",
     ctaMode: (banner.ctaMode as "LINK" | "ADD_TO_CART" | undefined) ?? "LINK",
     ctaProductId: banner.ctaProductId ?? "",
+    campaignBadge: banner.campaignBadge ?? "",
+    highlighted: banner.highlighted,
+    startsAt: banner.startsAt?.toISOString() ?? "",
+    endsAt: banner.endsAt?.toISOString() ?? "",
     active: banner.active,
     displayOrder: banner.displayOrder,
   };

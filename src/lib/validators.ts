@@ -137,6 +137,11 @@ export const adminBannerSchema = z.object({
     .refine((value) => !value || isBannerLink(value), "Informe um link valido para o botao.")
     .default("#cardapio"),
   ctaProductId: z.string().trim().optional().default(""),
+  campaignBadge: z.string().trim().max(32, "O selo da campanha deve ter ate 32 caracteres.").optional().default(""),
+  highlighted: z.coerce.boolean().default(false),
+  startsAt: z.string().trim().optional().default(""),
+  endsAt: z.string().trim().optional().default(""),
+  displayOrder: z.coerce.number().int().min(0).default(0),
   active: z.coerce.boolean().default(true),
 }).superRefine((data, context) => {
   if (data.ctaMode === "LINK" && !data.ctaHref) {
@@ -153,5 +158,34 @@ export const adminBannerSchema = z.object({
       path: ["ctaProductId"],
       message: "Escolha o produto que o banner deve adicionar ao carrinho.",
     });
+  }
+
+  if (data.startsAt && Number.isNaN(new Date(data.startsAt).getTime())) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["startsAt"],
+      message: "Informe uma data inicial valida para a campanha.",
+    });
+  }
+
+  if (data.endsAt && Number.isNaN(new Date(data.endsAt).getTime())) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["endsAt"],
+      message: "Informe uma data final valida para a campanha.",
+    });
+  }
+
+  if (data.startsAt && data.endsAt) {
+    const startsAt = new Date(data.startsAt).getTime();
+    const endsAt = new Date(data.endsAt).getTime();
+
+    if (!Number.isNaN(startsAt) && !Number.isNaN(endsAt) && endsAt < startsAt) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["endsAt"],
+        message: "A data final deve ser maior ou igual a data inicial.",
+      });
+    }
   }
 });

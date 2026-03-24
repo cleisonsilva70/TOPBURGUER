@@ -47,6 +47,11 @@ export type PromoBanner = {
   ctaHref?: string;
   ctaMode?: "LINK" | "ADD_TO_CART";
   ctaProductId?: string;
+  campaignBadge?: string;
+  highlighted?: boolean;
+  startsAt?: string;
+  endsAt?: string;
+  displayOrder?: number;
   active?: boolean;
 };
 

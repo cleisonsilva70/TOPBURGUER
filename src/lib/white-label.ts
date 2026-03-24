@@ -150,17 +150,50 @@ export async function getResolvedPromoBanners() {
     return fallback;
   }
 
-  return banners.map((banner) => ({
-    id: banner.id,
-    title: banner.title,
-    description: banner.description,
-    imageUrl: banner.imageUrl,
-    ctaLabel: banner.ctaLabel,
-    ctaHref: banner.ctaHref ?? "#cardapio",
-    ctaMode: (banner.ctaMode as "LINK" | "ADD_TO_CART" | undefined) ?? "LINK",
-    ctaProductId: banner.ctaProductId ?? undefined,
-    active: banner.active,
-  }));
+  const now = Date.now();
+
+  return banners
+    .filter((banner) => {
+      const startsAt = banner.startsAt?.getTime();
+      const endsAt = banner.endsAt?.getTime();
+
+      if (startsAt && startsAt > now) {
+        return false;
+      }
+
+      if (endsAt && endsAt < now) {
+        return false;
+      }
+
+      return true;
+    })
+    .sort((left, right) => {
+      if (left.highlighted !== right.highlighted) {
+        return left.highlighted ? -1 : 1;
+      }
+
+      if (left.displayOrder !== right.displayOrder) {
+        return left.displayOrder - right.displayOrder;
+      }
+
+      return left.createdAt.getTime() - right.createdAt.getTime();
+    })
+    .map((banner) => ({
+      id: banner.id,
+      title: banner.title,
+      description: banner.description,
+      imageUrl: banner.imageUrl,
+      ctaLabel: banner.ctaLabel,
+      ctaHref: banner.ctaHref ?? "#cardapio",
+      ctaMode: (banner.ctaMode as "LINK" | "ADD_TO_CART" | undefined) ?? "LINK",
+      ctaProductId: banner.ctaProductId ?? undefined,
+      campaignBadge: banner.campaignBadge ?? undefined,
+      highlighted: banner.highlighted,
+      startsAt: banner.startsAt?.toISOString(),
+      endsAt: banner.endsAt?.toISOString(),
+      displayOrder: banner.displayOrder,
+      active: banner.active,
+    }));
 }
 
 export function getThemeStyleVariables(branding = getBrandingConfig()) {

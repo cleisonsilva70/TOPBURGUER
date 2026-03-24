@@ -45,6 +45,10 @@ type AdminBanner = {
   ctaMode: "LINK" | "ADD_TO_CART";
   ctaHref: string;
   ctaProductId: string;
+  campaignBadge: string;
+  highlighted: boolean;
+  startsAt: string;
+  endsAt: string;
   active: boolean;
   displayOrder: number;
 };
@@ -58,6 +62,11 @@ type BannerFormState = {
   ctaMode: "LINK" | "ADD_TO_CART";
   ctaHref: string;
   ctaProductId: string;
+  campaignBadge: string;
+  highlighted: boolean;
+  startsAt: string;
+  endsAt: string;
+  displayOrder: string;
   active: boolean;
 };
 
@@ -135,6 +144,11 @@ const emptyBannerForm: BannerFormState = {
   ctaMode: "LINK",
   ctaHref: "#cardapio",
   ctaProductId: "",
+  campaignBadge: "",
+  highlighted: false,
+  startsAt: "",
+  endsAt: "",
+  displayOrder: "1",
   active: true,
 };
 
@@ -353,6 +367,18 @@ export function CatalogManager() {
     );
   }, [categories]);
 
+  useEffect(() => {
+    if (banners.length === 0) {
+      return;
+    }
+
+    setBannerForm((current) =>
+      current.id || current.title
+        ? current
+        : { ...current, displayOrder: String(banners.length + 1) },
+    );
+  }, [banners]);
+
   const filteredProducts = useMemo(() => {
     const term = productSearch.trim().toLowerCase();
 
@@ -387,6 +413,25 @@ export function CatalogManager() {
   const deliveredOrdersCount = useMemo(
     () => orders.filter((order) => order.status === "ENTREGUE").length,
     [orders],
+  );
+  const paidOrdersCount = useMemo(
+    () => orders.filter((order) => order.paymentStatus === "PAGO").length,
+    [orders],
+  );
+  const pendingOrdersCount = useMemo(
+    () => orders.filter((order) => order.paymentStatus === "PENDENTE").length,
+    [orders],
+  );
+  const totalRevenue = useMemo(
+    () =>
+      orders
+        .filter((order) => order.paymentStatus === "PAGO")
+        .reduce((acc, order) => acc + order.total, 0),
+    [orders],
+  );
+  const averageTicket = useMemo(
+    () => (paidOrdersCount > 0 ? totalRevenue / paidOrdersCount : 0),
+    [paidOrdersCount, totalRevenue],
   );
 
   const recentOrders = useMemo(() => orders.slice(0, 6), [orders]);
@@ -624,6 +669,11 @@ export function CatalogManager() {
             ctaMode: bannerForm.ctaMode,
             ctaHref: bannerForm.ctaHref,
             ctaProductId: bannerForm.ctaProductId,
+            campaignBadge: bannerForm.campaignBadge,
+            highlighted: bannerForm.highlighted,
+            startsAt: bannerForm.startsAt,
+            endsAt: bannerForm.endsAt,
+            displayOrder: Number(bannerForm.displayOrder),
             active: bannerForm.active,
           }),
         },
@@ -637,7 +687,10 @@ export function CatalogManager() {
       }
 
       setSuccess(isEditing ? "Banner atualizado." : "Banner criado.");
-      setBannerForm(emptyBannerForm);
+      setBannerForm({
+        ...emptyBannerForm,
+        displayOrder: String((banners.length || 0) + (isEditing ? 0 : 1)),
+      });
       await loadData();
       setActiveSection("banners");
     } catch {
@@ -689,6 +742,11 @@ export function CatalogManager() {
         ctaMode: banner.ctaMode,
         ctaHref: banner.ctaHref,
         ctaProductId: banner.ctaProductId,
+        campaignBadge: banner.campaignBadge,
+        highlighted: banner.highlighted,
+        startsAt: banner.startsAt ? banner.startsAt.slice(0, 16) : "",
+        endsAt: banner.endsAt ? banner.endsAt.slice(0, 16) : "",
+        displayOrder: String(banner.displayOrder),
         active: banner.active,
       });
     setActiveSection("banners");
@@ -809,6 +867,42 @@ export function CatalogManager() {
               <p className="mt-4 text-4xl font-black">{activeBannersCount}</p>
               <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
                 Banners ativos na vitrine principal da loja.
+              </p>
+            </article>
+            <article className="panel-card luxury-section p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
+                Pagos
+              </p>
+              <p className="mt-4 text-4xl font-black">{paidOrdersCount}</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                Pedidos com pagamento confirmado nesta operacao.
+              </p>
+            </article>
+            <article className="panel-card luxury-section p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
+                Pendentes
+              </p>
+              <p className="mt-4 text-4xl font-black">{pendingOrdersCount}</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                Pedidos aguardando confirmacao no atendimento.
+              </p>
+            </article>
+            <article className="panel-card luxury-section p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
+                Faturamento
+              </p>
+              <p className="mt-4 text-4xl font-black">{formatCurrency(totalRevenue)}</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                Total pago registrado nesta base ate agora.
+              </p>
+            </article>
+            <article className="panel-card luxury-section p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
+                Ticket medio
+              </p>
+              <p className="mt-4 text-4xl font-black">{formatCurrency(averageTicket)}</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                Media de venda considerando os pedidos pagos.
               </p>
             </article>
             <article className="panel-card luxury-section p-5 md:col-span-2 xl:col-span-4">
@@ -1794,6 +1888,37 @@ export function CatalogManager() {
                   setBannerForm((current) => ({ ...current, imageUrl: value }))
                 }
               />
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold">Selo da campanha</span>
+                  <input
+                    value={bannerForm.campaignBadge}
+                    onChange={(event) =>
+                      setBannerForm((current) => ({
+                        ...current,
+                        campaignBadge: event.target.value,
+                      }))
+                    }
+                    placeholder="Ex.: Combo da semana"
+                    className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
+                  />
+                </label>
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold">Ordem de exibicao</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={bannerForm.displayOrder}
+                    onChange={(event) =>
+                      setBannerForm((current) => ({
+                        ...current,
+                        displayOrder: event.target.value,
+                      }))
+                    }
+                    className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
+                  />
+                </label>
+              </div>
               <label className="block space-y-2">
                 <span className="text-sm font-semibold">Texto do botao</span>
                 <input
@@ -1869,6 +1994,49 @@ export function CatalogManager() {
                     : <>Use <strong>#cardapio</strong> para rolar ate os produtos, <strong>/checkout</strong> para abrir o checkout, ou um link completo como <strong>https://wa.me/...</strong>.</>}
                 </p>
               </label>
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold">Iniciar campanha em</span>
+                  <input
+                    type="datetime-local"
+                    value={bannerForm.startsAt}
+                    onChange={(event) =>
+                      setBannerForm((current) => ({
+                        ...current,
+                        startsAt: event.target.value,
+                      }))
+                    }
+                    className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
+                  />
+                </label>
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold">Encerrar campanha em</span>
+                  <input
+                    type="datetime-local"
+                    value={bannerForm.endsAt}
+                    onChange={(event) =>
+                      setBannerForm((current) => ({
+                        ...current,
+                        endsAt: event.target.value,
+                      }))
+                    }
+                    className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
+                  />
+                </label>
+              </div>
+              <label className="inline-flex items-center gap-3 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={bannerForm.highlighted}
+                  onChange={(event) =>
+                    setBannerForm((current) => ({
+                      ...current,
+                      highlighted: event.target.checked,
+                    }))
+                  }
+                />
+                Banner em destaque principal
+              </label>
               <label className="inline-flex items-center gap-3 text-sm font-semibold">
                 <input
                   type="checkbox"
@@ -1929,6 +2097,16 @@ export function CatalogManager() {
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="text-lg font-black">{banner.title}</h3>
+                          {banner.campaignBadge ? (
+                            <span className="rounded-full bg-[var(--accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em]">
+                              {banner.campaignBadge}
+                            </span>
+                          ) : null}
+                          {banner.highlighted ? (
+                            <span className="rounded-full bg-[var(--brand)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
+                              Destaque principal
+                            </span>
+                          ) : null}
                           {!banner.active ? (
                             <span className="rounded-full bg-[var(--surface)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
                               Inativo
@@ -1945,6 +2123,11 @@ export function CatalogManager() {
                           {banner.ctaMode === "ADD_TO_CART"
                             ? `Adiciona ao carrinho: ${products.find((product) => product.id === banner.ctaProductId)?.name ?? "Produto nao encontrado"}`
                             : banner.ctaHref || "#cardapio"}
+                        </p>
+                        <p className="mt-2 text-xs text-[var(--muted)]">
+                          Ordem: {banner.displayOrder}
+                          {banner.startsAt ? ` | Inicia: ${new Date(banner.startsAt).toLocaleString("pt-BR")}` : ""}
+                          {banner.endsAt ? ` | Encerra: ${new Date(banner.endsAt).toLocaleString("pt-BR")}` : ""}
                         </p>
                       </div>
                       <button

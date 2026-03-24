@@ -2,93 +2,97 @@
 
 ## Objetivo
 
-Esta base foi preparada em modelo white-label. Para entregar um novo cardápio digital para outra hamburgueria, troque apenas os arquivos de configuração e os assets.
+Esta base foi preparada para voce copiar, personalizar e entregar para outra hamburgueria sem reescrever o sistema.
 
-## Arquivos que voce altera
+## Checklist de implantacao
 
-- `data/store.json`
-- `data/branding.json`
-- `data/banners.json`
-- `data/products.json`
-- `public/branding/*`
+1. Duplicar a base do projeto.
+2. Definir o nome da loja, WhatsApp, horario, endereco e senha interna.
+3. Ajustar identidade visual da marca.
+4. Cadastrar categorias, produtos, tamanhos, opcionais e banners.
+5. Testar pedido completo, atendimento e cozinha.
+6. Publicar, entregar os links e orientar o cliente.
 
-## O que mudar em cada arquivo
+## O que configurar primeiro
 
-### `data/store.json`
+### Loja e marca
 
 - nome da hamburgueria
 - nome curto
-- slug do projeto
-- iniciais da marca
-- caminho da logo
-- numero do WhatsApp
+- logo
 - telefone exibido
+- WhatsApp
 - endereco
 - horario de funcionamento
-- taxa de entrega
+- cores
 
-### `data/branding.json`
+### Categorias e produtos
 
-- cores principais
-- titulo da home
-- descricao principal
-- tagline
+- criar categorias e definir a ordem do cardapio
+- cadastrar produtos
+- definir destaque
+- configurar tamanhos
+- configurar opcionais
+- habilitar observacao do cliente quando fizer sentido
 
-### `data/banners.json`
+### Promocoes e banners
 
-- banners promocionais
-- campanhas
-- combos em destaque
+- subir imagem
+- definir texto do botao
+- escolher se o banner abre link ou adiciona produto ao carrinho
+- informar ordem de exibicao
+- informar selo da campanha
+- marcar destaque principal quando quiser puxar a promocao para o topo
+- usar datas de inicio e fim para campanhas sazonais
 
-### `public/branding`
+## Variaveis por cliente
 
-- logo do cliente
-- favicon
-- imagens institucionais
+No ambiente publicado, configure:
 
-Se quiser usar uma logo real no topo, coloque o arquivo em `public/branding/` e ajuste `logoPath` em `data/store.json`.
+- `DATABASE_URL`
+- `OWNER_ACCESS_PASSWORD`
+- `OWNER_SESSION_SECRET`
+- `ALLOW_DEMO_MODE=false`
+- `APP_BASE_URL`
 
-### `data/products.json`
+## Fluxo operacional entregue
 
-- produtos
-- descricoes
-- precos
-- categorias
-- imagens
+1. Cliente monta o pedido no cardapio.
+2. Pedido chega no WhatsApp.
+3. Atendimento confirma o pagamento.
+4. Pedido liberado entra na cozinha.
+5. Cozinha acompanha por colunas ate entregar.
 
-## Fluxo rapido para vender a proxima copia
+## Testes antes da entrega
 
-1. Duplicar esta base
-2. Atualizar `data/*.json`
-3. Trocar senha da cozinha em `.env.local`
-4. Se usar banco, ajustar `DATABASE_URL`
-5. Rodar:
+1. Criar pedido com item simples.
+2. Criar pedido com tamanho e opcionais.
+3. Confirmar que a mensagem do WhatsApp saiu formatada.
+4. Confirmar que o pedido aparece no atendimento.
+5. Marcar como pago.
+6. Confirmar entrada na cozinha.
+7. Mover ate entregue.
+8. Verificar historico no painel.
 
-```powershell
-npm install
-npm run prisma:generate
-npm run prisma:seed
-npm run build
-```
+## Links que voce entrega
 
-6. Publicar
+- vitrine principal
+- login interno
+- atendimento
+- cozinha
+- painel administrativo, se fizer parte do combinado
 
-## Beneficio
+## Recomendacao comercial
 
-Voce nao precisa reescrever a logica do sistema. Troca apenas os dados do cliente e entrega uma nova hamburgueria com a mesma base.
+Venda primeiro como:
 
-## Edicao rapida via painel
+- cardapio digital personalizado
+- pedido via WhatsApp
+- atendimento e cozinha organizados
 
-Com a senha da cozinha, voce tambem pode acessar:
+Depois, ofereca como upgrade:
 
-- `/painel`
-
-Essa area permite:
-
-- criar produto
-- editar produto
-- ativar ou desativar item
-- ajustar preco, descricao e imagem
-- enviar imagens de produto, banner e logo da loja
-
-Hoje o painel cobre catalogo, dados da loja, branding e banners. Os arquivos em `data/*.json` seguem como base inicial para acelerar a entrega de novos clientes.
+- campanhas sazonais
+- troca recorrente de banners
+- cadastro mensal de produtos
+- publicacao e suporte
