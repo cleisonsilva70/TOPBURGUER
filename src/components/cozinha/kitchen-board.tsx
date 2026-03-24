@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Search, TabletSmartphone, Trash2, Volume2 } from "lucide-react";
 import {
   kitchenStatusActions,
   orderStatusLabels,
@@ -37,6 +37,9 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
   const [isClearingDelivered, setIsClearingDelivered] = useState(false);
   const [boardError, setBoardError] = useState("");
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundProfile, setSoundProfile] = useState<"restaurant" | "soft">("restaurant");
+  const [search, setSearch] = useState("");
+  const [tabletMode, setTabletMode] = useState(false);
   const soundEnabledRef = useRef(true);
   const previousNewOrderIdsRef = useRef(
     new Set(
@@ -46,7 +49,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
     ),
   );
 
-  function playAlertTone() {
+  const playAlertTone = useCallback(() => {
     if (typeof window === "undefined") {
       return;
     }
@@ -65,10 +68,11 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
 
     const masterGain = audioContext.createGain();
     masterGain.connect(audioContext.destination);
-    masterGain.gain.setValueAtTime(0.9, audioContext.currentTime);
+    masterGain.gain.setValueAtTime(soundProfile === "restaurant" ? 0.9 : 0.45, audioContext.currentTime);
 
-    const strikeOffsets = [0, 0.22, 0.48];
-    const strikeDuration = 0.9;
+    const strikeOffsets =
+      soundProfile === "restaurant" ? [0, 0.22, 0.48] : [0, 0.28];
+    const strikeDuration = soundProfile === "restaurant" ? 0.9 : 0.7;
 
     for (const offset of strikeOffsets) {
       const start = audioContext.currentTime + offset;
@@ -111,7 +115,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
     window.setTimeout(() => {
       void audioContext.close();
     }, 1800);
-  }
+  }, [soundProfile]);
 
   useEffect(() => {
     const storedValue = window.localStorage.getItem("kitchen-sound-enabled");
@@ -163,12 +167,22 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
     }, 15000);
 
     return () => window.clearInterval(timer);
-  }, [router]);
+  }, [playAlertTone, router]);
 
   const groupedOrders = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    const visibleOrders = !term
+      ? orders
+      : orders.filter((order) => {
+          return (
+            order.customerName.toLowerCase().includes(term) ||
+            order.orderNumberFormatted.toLowerCase().includes(term)
+          );
+        });
+
     return orderStatusSequence.reduce<Record<OrderStatus, Order[]>>(
       (acc, status) => {
-        acc[status] = orders.filter((order) => order.status === status);
+        acc[status] = visibleOrders.filter((order) => order.status === status);
         return acc;
       },
       {
@@ -178,7 +192,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
         ENTREGUE: [],
       },
     );
-  }, [orders]);
+  }, [orders, search]);
 
   function getOrderAgeInMinutes(createdAt: string) {
     const created = new Date(createdAt).getTime();
@@ -296,6 +310,26 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
             </button>
             <button
               type="button"
+              onClick={() =>
+                setSoundProfile((current) =>
+                  current === "restaurant" ? "soft" : "restaurant",
+                )
+              }
+              className="glass-pill inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+            >
+              <Volume2 size={16} />
+              {soundProfile === "restaurant" ? "Som restaurante" : "Som suave"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setTabletMode((current) => !current)}
+              className="glass-pill inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+            >
+              <TabletSmartphone size={16} />
+              {tabletMode ? "Modo tablet ligado" : "Modo tablet padrao"}
+            </button>
+            <button
+              type="button"
               onClick={playAlertTone}
               className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
             >
@@ -327,7 +361,24 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
       ) : null}
 
       <section className="overflow-x-auto pb-2">
-        <div className="grid min-w-[1180px] grid-cols-4 gap-5">
+        <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <label className="relative block w-full max-w-md">
+            <Search
+              size={16}
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]"
+            />
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Buscar por cliente ou pedido"
+              className="w-full rounded-full border border-[var(--line)] bg-white py-3 pl-11 pr-4 text-sm"
+            />
+          </label>
+          <div className="glass-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--brand-strong)]">
+            {search ? "Filtro ativo" : "Todos os pedidos"}
+          </div>
+        </div>
+        <div className={`grid grid-cols-4 gap-5 ${tabletMode ? "min-w-[1360px]" : "min-w-[1180px]"}`}>
           {orderStatusSequence.map((status) => (
             <div
               key={status}
@@ -378,6 +429,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                       key={order.id}
                       className={cn(
                         "luxury-section relative overflow-hidden rounded-[24px] border bg-white p-4 shadow-[0_12px_30px_rgba(46,23,12,0.06)]",
+                        tabletMode ? "min-h-[420px]" : "",
                         isFresh
                           ? "border-[var(--brand)] shadow-[0_0_0_2px_rgba(184,68,31,0.12)]"
                           : isDelayed

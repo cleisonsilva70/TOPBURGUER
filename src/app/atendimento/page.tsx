@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { ServiceBoard } from "@/components/atendimento/service-board";
 import { isOwnerAuthenticated } from "@/lib/auth";
-import { listPendingPaymentOrders } from "@/lib/order-repository";
+import { listOrders } from "@/lib/order-repository";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,7 @@ export default async function AtendimentoPage() {
     redirect("/acesso-cozinha");
   }
 
-  const orders = await listPendingPaymentOrders();
+  const orders = await listOrders();
 
   return (
     <main className="container-shell py-8 pb-16 sm:py-12">

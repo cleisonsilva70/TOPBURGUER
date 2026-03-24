@@ -38,6 +38,7 @@ export function CheckoutForm({
     houseNumber: "",
     deliveryArea: deliveryAreas[0]?.id ?? "",
     reference: "",
+    customerNote: "",
     paymentMethod: "PIX" as PaymentMethod,
   });
   const [error, setError] = useState("");
@@ -110,6 +111,7 @@ export function CheckoutForm({
       address: formData.address.trim(),
       houseNumber: formData.houseNumber.trim(),
       reference: formData.reference.trim(),
+      customerNote: formData.customerNote.trim(),
     });
 
     if (!parsedCheckout.success) {
@@ -132,9 +134,14 @@ export function CheckoutForm({
     try {
       const draftItems = items.map((item) => ({
         id: item.id,
+        cartItemId: item.cartItemId,
         name: item.name,
         price: item.price,
         quantity: item.quantity,
+        selectedSizeId: item.selectedSizeId,
+        selectedOptionalItemIds: item.selectedOptionalItemIds,
+        customerNote: item.customerNote,
+        customizationText: item.customizationText,
         subtotal: item.subtotal,
       }));
 
@@ -315,6 +322,17 @@ export function CheckoutForm({
               className="w-full rounded-2xl border border-[var(--line)] bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)]"
             />
           </label>
+
+          <label className="space-y-2 sm:col-span-2">
+            <span className="text-sm font-semibold">Observacao geral do pedido</span>
+            <textarea
+              value={formData.customerNote}
+              onChange={(event) => updateField("customerNote", event.target.value)}
+              rows={3}
+              placeholder="Ex.: tocar o interfone, retirar ketchup, mandar troco para R$ 50"
+              className="w-full rounded-2xl border border-[var(--line)] bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)]"
+            />
+          </label>
         </div>
 
         {error ? (
@@ -352,7 +370,7 @@ export function CheckoutForm({
           ) : (
             items.map((item) => (
               <div
-                key={item.id}
+                key={item.cartItemId}
                 className="panel-subtle p-4"
               >
                 <div className="flex flex-wrap items-center justify-between gap-4">
@@ -361,6 +379,11 @@ export function CheckoutForm({
                     <p className="mt-1 text-sm text-[var(--muted)]">
                       {item.quantity}x {formatCurrency(item.price)}
                     </p>
+                    {item.customizationText ? (
+                      <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
+                        {item.customizationText}
+                      </p>
+                    ) : null}
                   </div>
                   <strong className="text-[var(--brand)]">
                     {formatCurrency(item.subtotal)}

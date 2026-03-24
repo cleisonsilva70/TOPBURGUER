@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, SlidersHorizontal } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { isInlineImage } from "@/lib/image-reference";
 import type { Product } from "@/lib/types";
@@ -12,6 +12,12 @@ type ProductCardProps = {
 };
 
 export function ProductCard({ product, onAdd }: ProductCardProps) {
+  const isCustomizable =
+    Boolean(product.compositionText) ||
+    Boolean(product.allowCustomerNote) ||
+    Boolean(product.sizeOptions?.length) ||
+    Boolean(product.optionalItems?.length);
+
   return (
     <article className="group relative overflow-hidden rounded-[30px] border border-[var(--line)] bg-[linear-gradient(180deg,rgba(255,250,243,0.96),rgba(255,243,230,0.92))] shadow-[0_24px_52px_rgba(80,41,21,0.12)] transition-transform duration-300 hover:-translate-y-1.5">
       <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-[color-mix(in_srgb,var(--accent)_26%,transparent)] blur-3xl" />
@@ -39,6 +45,11 @@ export function ProductCard({ product, onAdd }: ProductCardProps) {
           <p className="min-h-14 text-sm leading-6 text-[var(--muted)]">
             {product.description}
           </p>
+          {product.compositionText ? (
+            <p className="text-xs leading-5 text-[var(--muted)]">
+              Composicao: {product.compositionText}
+            </p>
+          ) : null}
         </div>
 
         <div className="flex flex-col gap-4 border-t border-[rgba(70,37,17,0.08)] pt-4">
@@ -62,8 +73,8 @@ export function ProductCard({ product, onAdd }: ProductCardProps) {
             onClick={() => onAdd(product)}
             className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-4 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-[0_16px_26px_rgba(145,47,18,0.2)] transition-transform duration-200 hover:-translate-y-0.5"
           >
-            <ShoppingBag size={16} />
-            Adicionar ao pedido
+            {isCustomizable ? <SlidersHorizontal size={16} /> : <ShoppingBag size={16} />}
+            {isCustomizable ? "Personalizar item" : "Adicionar ao pedido"}
           </button>
         </div>
       </div>

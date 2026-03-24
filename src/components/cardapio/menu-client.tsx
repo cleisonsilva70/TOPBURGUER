@@ -6,6 +6,7 @@ import { SectionTitle } from "@/components/ui/section-title";
 import { formatCategoryLabel } from "@/lib/constants";
 import type { Product, StoreCategory } from "@/lib/types";
 import { useCartStore } from "@/store/cart-store";
+import { ProductCustomizerModal } from "./product-customizer-modal";
 import { ProductCard } from "./product-card";
 
 export function MenuClient({
@@ -18,6 +19,7 @@ export function MenuClient({
   const addItem = useCartStore((state) => state.addItem);
   const items = useCartStore((state) => state.items);
   const [activeCategory, setActiveCategory] = useState<string>("TODOS");
+  const [customizingProduct, setCustomizingProduct] = useState<Product | null>(null);
 
   const visibleCategories = useMemo(() => {
     const categoryOrder = new Map(
@@ -53,6 +55,21 @@ export function MenuClient({
   }, [activeCategory, products]);
 
   const mobileItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
+
+  function handleAddProduct(product: Product) {
+    const isCustomizable =
+      Boolean(product.compositionText) ||
+      Boolean(product.allowCustomerNote) ||
+      Boolean(product.sizeOptions?.length) ||
+      Boolean(product.optionalItems?.length);
+
+    if (isCustomizable) {
+      setCustomizingProduct(product);
+      return;
+    }
+
+    addItem(product);
+  }
 
   return (
     <div id="cardapio" className="container-shell py-8 sm:py-12">
@@ -104,11 +121,18 @@ export function MenuClient({
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
         <div className="grid gap-5 sm:grid-cols-2 2xl:grid-cols-3">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} onAdd={addItem} />
+            <ProductCard key={product.id} product={product} onAdd={handleAddProduct} />
           ))}
         </div>
         <CartPanel />
       </div>
+
+      <ProductCustomizerModal
+        key={customizingProduct?.id ?? "customizer"}
+        product={customizingProduct}
+        isOpen={Boolean(customizingProduct)}
+        onClose={() => setCustomizingProduct(null)}
+      />
     </div>
   );
 }

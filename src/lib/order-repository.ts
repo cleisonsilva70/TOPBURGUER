@@ -1,5 +1,12 @@
 import { prisma } from "./prisma";
 import { buildMockPaymentCode } from "./payment";
+import {
+  buildCustomizationText,
+  parseOptionalItemsText,
+  parseSizeOptionsText,
+  stringifyOptionalItems,
+  stringifySizeOptions,
+} from "./product-customization";
 import { buildOrderMessage, buildWhatsAppUrl } from "./whatsapp";
 import {
   formatDeliveryAreasText,
@@ -49,10 +56,12 @@ export class OrderFlowError extends Error {
 type PersistedOrderItem = {
   id: string;
   productId: string | null;
+  cartItemId?: string | null;
   productName: string;
   category: string;
   unitPrice: { toString(): string } | number;
   quantity: number;
+  customizationText?: string | null;
   subtotal: { toString(): string } | number;
 };
 
@@ -66,6 +75,7 @@ type PersistedOrder = {
   houseNumber: string;
   deliveryArea?: string | null;
   reference: string | null;
+  customerNote?: string | null;
   paymentMethod: Order["paymentMethod"];
   paymentStatus: PaymentStatus;
   paymentProvider: string | null;
@@ -86,12 +96,43 @@ type PersistedOrder = {
   items: PersistedOrderItem[];
 };
 
-type RequestedCartItem = Pick<CartItem, "id" | "quantity">;
+type RequestedCartItem = {
+  id: CartItem["id"];
+  quantity: CartItem["quantity"];
+  cartItemId?: CartItem["cartItemId"];
+  selectedSizeId?: CartItem["selectedSizeId"];
+  selectedOptionalItemIds?: CartItem["selectedOptionalItemIds"];
+  customerNote?: CartItem["customerNote"];
+};
 
 type ResolvedCartItem = CartItem;
 
 function normalizeCategoryName(value: string) {
   return value.trim();
+}
+
+function parseSizeOptionsJson(value?: string | null) {
+  if (!value) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return [];
+  }
+}
+
+function parseOptionalItemsJson(value?: string | null) {
+  if (!value) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return [];
+  }
 }
 
 function sortProductsByCategories<T extends { category: string; name: string; displayOrder?: number }>(
@@ -125,12 +166,14 @@ function sortProductsByCategories<T extends { category: string; name: string; di
 
 function mapItems(items: CartItem[]): OrderItem[] {
   return items.map((item) => ({
-    id: `${item.id}-${Math.random().toString(16).slice(2, 8)}`,
+    id: item.cartItemId || `${item.id}-${Math.random().toString(16).slice(2, 8)}`,
     productId: item.id,
+    cartItemId: item.cartItemId,
     productName: item.name,
     category: item.category,
     unitPrice: item.price,
     quantity: item.quantity,
+    customizationText: item.customizationText,
     subtotal: item.subtotal,
   }));
 }
@@ -167,10 +210,11 @@ function toOrder(params: {
     customerName: params.checkout.customerName,
     phone: params.checkout.phone,
     address: params.checkout.address,
-    houseNumber: params.checkout.houseNumber,
-    deliveryArea: params.checkout.deliveryArea,
-    reference: params.checkout.reference,
-    paymentMethod: params.checkout.paymentMethod,
+  houseNumber: params.checkout.houseNumber,
+  deliveryArea: params.checkout.deliveryArea,
+  reference: params.checkout.reference,
+  customerNote: params.checkout.customerNote,
+  paymentMethod: params.checkout.paymentMethod,
     paymentStatus: params.paymentStatus ?? "PENDENTE",
     paymentProvider: params.paymentProvider,
     paymentExternalId: params.paymentExternalId,
@@ -222,10 +266,38 @@ async function resolveCartItems(items: RequestedCartItem[]): Promise<ResolvedCar
       throw new OrderFlowError("Um dos produtos enviados nao existe mais no cardapio.", 400);
     }
 
+    const selectedSize = product.sizeOptions?.find((option) => option.id === item.selectedSizeId);
+    const selectedOptionalItems = (product.optionalItems ?? []).filter((option) =>
+      (item.selectedOptionalItemIds ?? []).includes(option.id),
+    );
+    const selectedOptionalItemTotal = selectedOptionalItems.reduce(
+      (acc, option) => acc + option.price,
+      0,
+    );
+    const unitPrice =
+      product.price + (selectedSize?.priceDelta ?? 0) + selectedOptionalItemTotal;
+    const customizationText = buildCustomizationText({
+      sizeLabel: selectedSize?.label,
+      optionalLabels: selectedOptionalItems.map((option) => option.label),
+      customerNote: item.customerNote,
+    });
+
     return {
       ...product,
+      cartItemId:
+        item.cartItemId ??
+        `${product.id}-${Math.random().toString(16).slice(2, 10)}`,
+      selectedSizeId: selectedSize?.id,
+      selectedSizeLabel: selectedSize?.label,
+      selectedSizePriceDelta: selectedSize?.priceDelta ?? 0,
+      selectedOptionalItemIds: selectedOptionalItems.map((option) => option.id),
+      selectedOptionalItemLabels: selectedOptionalItems.map((option) => option.label),
+      selectedOptionalItemTotal,
+      customerNote: item.customerNote?.trim() || "",
+      customizationText,
       quantity: item.quantity,
-      subtotal: product.price * item.quantity,
+      price: unitPrice,
+      subtotal: unitPrice * item.quantity,
     };
   });
 }
@@ -270,6 +342,7 @@ function mapPersistedOrder(order: PersistedOrder): Order {
     houseNumber: order.houseNumber,
     deliveryArea: order.deliveryArea ?? undefined,
     reference: order.reference ?? undefined,
+    customerNote: order.customerNote ?? undefined,
     paymentMethod: order.paymentMethod,
     paymentStatus: order.paymentStatus,
     paymentProvider: order.paymentProvider ?? undefined,
@@ -291,10 +364,12 @@ function mapPersistedOrder(order: PersistedOrder): Order {
     items: order.items.map((item) => ({
       id: item.id,
       productId: item.productId ?? undefined,
+      cartItemId: item.cartItemId ?? undefined,
       productName: item.productName,
       category: item.category as OrderItem["category"],
       unitPrice: Number(item.unitPrice),
       quantity: item.quantity,
+      customizationText: item.customizationText ?? undefined,
       subtotal: Number(item.subtotal),
     })),
   };
@@ -351,6 +426,10 @@ export async function listProducts() {
     imageUrl: product.imageUrl,
     category: product.category,
     featured: product.featured,
+    compositionText: product.compositionText ?? "",
+    sizeOptions: parseSizeOptionsJson(product.sizeOptionsJson),
+    optionalItems: parseOptionalItemsJson(product.optionalItemsJson),
+    allowCustomerNote: product.allowCustomerNote,
   }));
 }
 
@@ -547,6 +626,7 @@ export async function createOrder(params: {
         houseNumber: params.checkout.houseNumber,
         deliveryArea: deliverySettings.deliveryArea,
         reference: params.checkout.reference,
+        customerNote: params.checkout.customerNote,
         paymentMethod: params.checkout.paymentMethod,
         paymentStatus: "PENDENTE",
         paymentProvider: null,
@@ -564,10 +644,12 @@ export async function createOrder(params: {
         items: {
           create: resolvedItems.map((item) => ({
             productId: item.id,
+            cartItemId: item.cartItemId,
             productName: item.name,
             category: item.category,
             unitPrice: item.price,
             quantity: item.quantity,
+            customizationText: item.customizationText || null,
             subtotal: item.subtotal,
           })),
         },
@@ -609,6 +691,10 @@ export async function listAdminProducts() {
     price: Number(item.price),
     imageUrl: item.imageUrl,
     category: item.category,
+    compositionText: item.compositionText ?? "",
+    sizeOptionsText: stringifySizeOptions(parseSizeOptionsJson(item.sizeOptionsJson)),
+    optionalItemsText: stringifyOptionalItems(parseOptionalItemsJson(item.optionalItemsJson)),
+    allowCustomerNote: item.allowCustomerNote,
     featured: item.featured,
     active: item.active,
     displayOrder: item.displayOrder,
@@ -622,6 +708,10 @@ export async function upsertAdminProduct(input: {
   price: number;
   imageUrl: string;
   category: string;
+  compositionText?: string;
+  sizeOptionsText?: string;
+  optionalItemsText?: string;
+  allowCustomerNote: boolean;
   featured: boolean;
   active: boolean;
 }) {
@@ -647,6 +737,10 @@ export async function upsertAdminProduct(input: {
             price: input.price,
             imageUrl: input.imageUrl,
             category: normalizeCategoryName(input.category),
+            compositionText: input.compositionText?.trim() || null,
+            sizeOptionsJson: JSON.stringify(parseSizeOptionsText(input.sizeOptionsText ?? "")),
+            optionalItemsJson: JSON.stringify(parseOptionalItemsText(input.optionalItemsText ?? "")),
+            allowCustomerNote: input.allowCustomerNote,
             featured: input.featured,
             active: input.active,
           },
@@ -659,6 +753,10 @@ export async function upsertAdminProduct(input: {
           price: input.price,
           imageUrl: input.imageUrl,
           category: normalizeCategoryName(input.category),
+          compositionText: input.compositionText?.trim() || null,
+          sizeOptionsJson: JSON.stringify(parseSizeOptionsText(input.sizeOptionsText ?? "")),
+          optionalItemsJson: JSON.stringify(parseOptionalItemsText(input.optionalItemsText ?? "")),
+          allowCustomerNote: input.allowCustomerNote,
           featured: input.featured,
           active: input.active,
           displayOrder: displayOrder + 1,
@@ -672,6 +770,10 @@ export async function upsertAdminProduct(input: {
     price: Number(product.price),
     imageUrl: product.imageUrl,
     category: product.category,
+    compositionText: product.compositionText ?? "",
+    sizeOptionsText: stringifySizeOptions(parseSizeOptionsJson(product.sizeOptionsJson)),
+    optionalItemsText: stringifyOptionalItems(parseOptionalItemsJson(product.optionalItemsJson)),
+    allowCustomerNote: product.allowCustomerNote,
     featured: product.featured,
     active: product.active,
     displayOrder: product.displayOrder,

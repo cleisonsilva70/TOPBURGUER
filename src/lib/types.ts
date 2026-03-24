@@ -26,6 +26,18 @@ export type StoreCategory = {
   displayOrder: number;
 };
 
+export type ProductSizeOption = {
+  id: string;
+  label: string;
+  priceDelta: number;
+};
+
+export type ProductOptionalItem = {
+  id: string;
+  label: string;
+  price: number;
+};
+
 export type PromoBanner = {
   id: string;
   title: string;
@@ -46,10 +58,23 @@ export type Product = {
   imageUrl: string;
   category: ProductCategory;
   featured?: boolean;
+  compositionText?: string;
+  sizeOptions?: ProductSizeOption[];
+  optionalItems?: ProductOptionalItem[];
+  allowCustomerNote?: boolean;
 };
 
 export type CartItem = Product & {
+  cartItemId: string;
   quantity: number;
+  selectedSizeId?: string;
+  selectedSizeLabel?: string;
+  selectedSizePriceDelta?: number;
+  selectedOptionalItemIds?: string[];
+  selectedOptionalItemLabels?: string[];
+  selectedOptionalItemTotal?: number;
+  customerNote?: string;
+  customizationText?: string;
   subtotal: number;
 };
 
@@ -60,16 +85,19 @@ export type CheckoutInput = {
   houseNumber: string;
   deliveryArea?: string;
   reference?: string;
+  customerNote?: string;
   paymentMethod: PaymentMethod;
 };
 
 export type OrderItem = {
   id: string;
   productId?: string;
+  cartItemId?: string;
   productName: string;
   category: string;
   unitPrice: number;
   quantity: number;
+  customizationText?: string;
   subtotal: number;
 };
 
@@ -83,6 +111,7 @@ export type Order = {
   houseNumber: string;
   deliveryArea?: string;
   reference?: string;
+  customerNote?: string;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   paymentProvider?: string;

@@ -17,14 +17,20 @@ type DraftPayload = {
     address: string;
     houseNumber: string;
     deliveryArea?: string;
-    reference?: string;
-    paymentMethod: PaymentMethod;
+      reference?: string;
+      customerNote?: string;
+      paymentMethod: PaymentMethod;
   };
   items: Array<{
     id: string;
+    cartItemId?: string;
     name: string;
     price: number;
     quantity: number;
+    selectedSizeId?: string;
+    selectedOptionalItemIds?: string[];
+    customerNote?: string;
+    customizationText?: string;
     subtotal: number;
   }>;
 };
@@ -61,9 +67,14 @@ export function ConfirmOrderPanel() {
 
     return cartItems.map((item) => ({
       id: item.id,
+      cartItemId: item.cartItemId,
       name: item.name,
       price: item.price,
       quantity: item.quantity,
+      selectedSizeId: item.selectedSizeId,
+      selectedOptionalItemIds: item.selectedOptionalItemIds,
+      customerNote: item.customerNote,
+      customizationText: item.customizationText,
       subtotal: item.subtotal,
     }));
   }, [cartItems, draft]);
@@ -193,6 +204,7 @@ export function ConfirmOrderPanel() {
               ["Endereco", `${draft.checkout.address}, ${draft.checkout.houseNumber}`],
               ["Bairro", draft.checkout.deliveryArea ?? "Nao informado"],
               ["Referencia", draft.checkout.reference ?? "Sem referencia"],
+              ["Observacao do pedido", draft.checkout.customerNote ?? "Sem observacao"],
               ["Pagamento", paymentLabels[draft.checkout.paymentMethod]],
             ].map(([label, value]) => (
               <div key={label} className="rounded-[22px] border border-[rgba(70,37,17,0.07)] bg-white/75 px-4 py-3">
@@ -213,13 +225,18 @@ export function ConfirmOrderPanel() {
           </p>
           <div className="mt-5 space-y-3">
             {summaryItems.map((item) => (
-              <div key={item.id} className="rounded-[22px] border border-white/8 bg-white/7 p-4">
+              <div key={item.cartItemId ?? item.id} className="rounded-[22px] border border-white/8 bg-white/7 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="font-bold uppercase tracking-[0.02em]">{item.name}</p>
                     <p className="mt-1 text-sm text-white/70">
                       {item.quantity}x {formatCurrency(item.price)}
                     </p>
+                    {item.customizationText ? (
+                      <p className="mt-2 text-xs leading-5 text-white/70">
+                        {item.customizationText}
+                      </p>
+                    ) : null}
                   </div>
                   <strong>{formatCurrency(item.subtotal)}</strong>
                 </div>

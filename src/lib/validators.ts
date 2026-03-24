@@ -23,6 +23,7 @@ export const checkoutSchema = z.object({
     .min(1, "Informe o numero da casa."),
   deliveryArea: z.string().trim().optional(),
   reference: z.string().trim().optional(),
+  customerNote: z.string().trim().max(240, "Use no maximo 240 caracteres na observacao.").optional(),
   paymentMethod: z.enum([
     "PIX",
     "DINHEIRO",
@@ -34,6 +35,10 @@ export const checkoutSchema = z.object({
 export const cartItemSchema = z.object({
   id: z.string(),
   quantity: z.number().int().positive(),
+  cartItemId: z.string().optional(),
+  selectedSizeId: z.string().trim().optional(),
+  selectedOptionalItemIds: z.array(z.string()).optional(),
+  customerNote: z.string().trim().max(240).optional(),
 });
 
 export const createOrderSchema = z.object({
@@ -59,6 +64,10 @@ export const adminProductSchema = z.object({
     .trim()
     .refine(isImageReference, "Informe uma imagem valida para o produto."),
   category: z.string().trim().min(2, "Informe a categoria do produto."),
+  compositionText: z.string().trim().optional().default(""),
+  sizeOptionsText: z.string().trim().optional().default(""),
+  optionalItemsText: z.string().trim().optional().default(""),
+  allowCustomerNote: z.coerce.boolean().default(false),
   featured: z.coerce.boolean().default(false),
   active: z.coerce.boolean().default(true),
 });

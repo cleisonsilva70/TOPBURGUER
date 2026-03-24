@@ -27,6 +27,10 @@ type AdminProduct = {
   price: number;
   imageUrl: string;
   category: ProductCategory;
+  compositionText: string;
+  sizeOptionsText: string;
+  optionalItemsText: string;
+  allowCustomerNote: boolean;
   featured: boolean;
   active: boolean;
   displayOrder: number;
@@ -114,6 +118,10 @@ const emptyProductForm = {
   price: "",
   imageUrl: "",
   category: "Burgers" as ProductCategory,
+  compositionText: "",
+  sizeOptionsText: "",
+  optionalItemsText: "",
+  allowCustomerNote: false,
   featured: false,
   active: true,
 };
@@ -488,6 +496,10 @@ export function CatalogManager() {
             price: Number(productForm.price),
             imageUrl: productForm.imageUrl,
             category: productForm.category,
+            compositionText: productForm.compositionText,
+            sizeOptionsText: productForm.sizeOptionsText,
+            optionalItemsText: productForm.optionalItemsText,
+            allowCustomerNote: productForm.allowCustomerNote,
             featured: productForm.featured,
             active: productForm.active,
           }),
@@ -640,12 +652,16 @@ export function CatalogManager() {
       id: product.id,
       name: product.name,
       description: product.description,
-      price: String(product.price),
-      imageUrl: product.imageUrl,
-      category: product.category,
-      featured: product.featured,
-      active: product.active,
-    });
+        price: String(product.price),
+        imageUrl: product.imageUrl,
+        category: product.category,
+        compositionText: product.compositionText,
+        sizeOptionsText: product.sizeOptionsText,
+        optionalItemsText: product.optionalItemsText,
+        allowCustomerNote: product.allowCustomerNote,
+        featured: product.featured,
+        active: product.active,
+      });
     setActiveSection("products");
     setSuccess("");
     setError("");
@@ -1515,7 +1531,76 @@ export function CatalogManager() {
                 }
               />
 
+              <label className="block space-y-2">
+                <span className="text-sm font-semibold">Composicao do produto</span>
+                <textarea
+                  value={productForm.compositionText}
+                  onChange={(event) =>
+                    setProductForm((current) => ({
+                      ...current,
+                      compositionText: event.target.value,
+                    }))
+                  }
+                  rows={3}
+                  placeholder="Ex.: pao brioche, carne 160g, queijo, bacon e molho da casa"
+                  className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
+                />
+              </label>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold">Tamanhos</span>
+                  <textarea
+                    value={productForm.sizeOptionsText}
+                    onChange={(event) =>
+                      setProductForm((current) => ({
+                        ...current,
+                        sizeOptionsText: event.target.value,
+                      }))
+                    }
+                    rows={5}
+                    placeholder={"Pequeno|0\nGrande|6"}
+                    className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
+                  />
+                  <p className="text-xs leading-6 text-[var(--muted)]">
+                    Use uma linha por tamanho: Nome|Acrescimo
+                  </p>
+                </label>
+
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold">Adicionais e opcionais</span>
+                  <textarea
+                    value={productForm.optionalItemsText}
+                    onChange={(event) =>
+                      setProductForm((current) => ({
+                        ...current,
+                        optionalItemsText: event.target.value,
+                      }))
+                    }
+                    rows={5}
+                    placeholder={"Queijo extra|3.5\nBacon extra|4"}
+                    className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
+                  />
+                  <p className="text-xs leading-6 text-[var(--muted)]">
+                    Use uma linha por opcional: Nome|Preco
+                  </p>
+                </label>
+              </div>
+
               <div className="flex flex-wrap gap-5">
+                <label className="inline-flex items-center gap-3 text-sm font-semibold">
+                  <input
+                    type="checkbox"
+                    checked={productForm.allowCustomerNote}
+                    onChange={(event) =>
+                      setProductForm((current) => ({
+                        ...current,
+                        allowCustomerNote: event.target.checked,
+                      }))
+                    }
+                  />
+                  Permitir observacao do cliente
+                </label>
                 <label className="inline-flex items-center gap-3 text-sm font-semibold">
                   <input
                     type="checkbox"
@@ -1632,6 +1717,16 @@ export function CatalogManager() {
                           <span>{formatCategoryLabel(product.category)}</span>
                           <span>{formatCurrency(product.price)}</span>
                         </div>
+                        {product.compositionText ? (
+                          <p className="mt-3 text-xs leading-5 text-[var(--muted)]">
+                            {product.compositionText}
+                          </p>
+                        ) : null}
+                        {(product.sizeOptionsText || product.optionalItemsText || product.allowCustomerNote) ? (
+                          <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--brand-strong)]">
+                            Produto personalizavel
+                          </p>
+                        ) : null}
                       </div>
 
                       <button

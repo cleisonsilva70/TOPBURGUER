@@ -3,15 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Search } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { paymentLabels, paymentStatusLabels } from "@/lib/constants";
 import type { Order } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "@/components/cozinha/logout-button";
 
-async function fetchPendingOrders(): Promise<Order[]> {
-  const response = await fetch("/api/pedidos?scope=atendimento", {
+async function fetchAtendimentoOrders(): Promise<Order[]> {
+  const response = await fetch("/api/pedidos", {
     cache: "no-store",
   });
 
@@ -31,11 +31,13 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
   const [orders, setOrders] = useState(initialOrders);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [boardError, setBoardError] = useState("");
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"PENDENTES" | "PAGOS">("PENDENTES");
 
   useEffect(() => {
     const timer = window.setInterval(async () => {
       try {
-        const nextOrders = await fetchPendingOrders();
+        const nextOrders = await fetchAtendimentoOrders();
         setOrders(nextOrders);
         setBoardError("");
       } catch (error) {
@@ -53,9 +55,41 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
   }, [router]);
 
   const totalPendingValue = useMemo(
-    () => orders.reduce((acc, order) => acc + order.total, 0),
+    () =>
+      orders
+        .filter((order) => order.paymentStatus === "PENDENTE")
+        .reduce((acc, order) => acc + order.total, 0),
     [orders],
   );
+
+  const paidOrdersCount = useMemo(
+    () => orders.filter((order) => order.paymentStatus === "PAGO").length,
+    [orders],
+  );
+
+  const pendingOrdersCount = useMemo(
+    () => orders.filter((order) => order.paymentStatus === "PENDENTE").length,
+    [orders],
+  );
+
+  const filteredOrders = useMemo(() => {
+    const term = search.trim().toLowerCase();
+
+    return orders.filter((order) => {
+      const matchesStatus =
+        filter === "PENDENTES"
+          ? order.paymentStatus === "PENDENTE"
+          : order.paymentStatus === "PAGO";
+
+      const matchesSearch =
+        !term ||
+        order.customerName.toLowerCase().includes(term) ||
+        order.orderNumberFormatted.toLowerCase().includes(term) ||
+        order.phone.toLowerCase().includes(term);
+
+      return matchesStatus && matchesSearch;
+    });
+  }, [filter, orders, search]);
 
   async function markAsPaid(orderId: string) {
     setLoadingId(orderId);
@@ -78,7 +112,16 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
         return;
       }
 
-      setOrders((current) => current.filter((order) => order.id !== orderId));
+      setOrders((current) =>
+        current.map((order) =>
+          order.id === orderId
+            ? {
+                ...order,
+                paymentStatus: "PAGO",
+              }
+            : order,
+        ),
+      );
     } catch {
       setBoardError("Falha ao confirmar o pagamento no atendimento.");
     } finally {
@@ -108,8 +151,14 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
               <p className="text-xs uppercase tracking-[0.24em] text-white/70">
                 Aguardando pagamento
               </p>
-              <strong className="mt-2 block text-3xl font-black">{orders.length}</strong>
+              <strong className="mt-2 block text-3xl font-black">{pendingOrdersCount}</strong>
               <p className="mt-2 text-xs text-white/70">{formatCurrency(totalPendingValue)}</p>
+            </div>
+            <div className="rounded-[26px] border border-[var(--line)] bg-white/80 px-5 py-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
+                Pagos hoje
+              </p>
+              <strong className="mt-2 block text-3xl font-black">{paidOrdersCount}</strong>
             </div>
             <Link
               href="/cozinha"
@@ -137,17 +186,51 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
       ) : null}
 
       <section className="grid gap-5 xl:grid-cols-2">
-        {orders.length === 0 ? (
+        <div className="xl:col-span-2 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <label className="relative block w-full max-w-md">
+            <Search
+              size={16}
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]"
+            />
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Buscar por cliente, telefone ou pedido"
+              className="w-full rounded-full border border-[var(--line)] bg-white py-3 pl-11 pr-4 text-sm"
+            />
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {[
+              ["PENDENTES", `Pendentes (${pendingOrdersCount})`],
+              ["PAGOS", `Pagos (${paidOrdersCount})`],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setFilter(value as "PENDENTES" | "PAGOS")}
+                className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${
+                  filter === value
+                    ? "bg-[var(--brand)] text-white"
+                    : "glass-pill text-[var(--foreground)]"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {filteredOrders.length === 0 ? (
           <div className="panel-card luxury-section p-8 text-center text-sm text-[var(--muted)] xl:col-span-2">
-            Nenhum pedido aguardando pagamento no momento.
+            Nenhum pedido encontrado para esse filtro.
           </div>
         ) : (
-          orders.map((order) => (
+          filteredOrders.map((order) => (
             <article
               key={order.id}
               className={cn(
                 "panel-card luxury-section relative overflow-hidden p-6",
                 loadingId === order.id ? "opacity-75" : "",
+                order.paymentStatus === "PENDENTE" ? "border-[rgba(184,68,31,0.18)]" : "",
               )}
             >
               <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-[color-mix(in_srgb,var(--accent)_32%,transparent)] blur-2xl" />
@@ -160,6 +243,11 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
                   <p className="mt-1 text-sm text-[var(--muted)]">
                     {order.displayTime} | {paymentStatusLabels[order.paymentStatus]}
                   </p>
+                  {Date.now() - new Date(order.createdAt).getTime() <= 8 * 60 * 1000 ? (
+                    <p className="mt-2 inline-flex rounded-full bg-[var(--accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--foreground)]">
+                      Pedido novo
+                    </p>
+                  ) : null}
                 </div>
                 <span className="glass-pill rounded-full px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[var(--foreground)]">
                   {paymentLabels[order.paymentMethod]}
@@ -203,11 +291,15 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
                 <button
                   type="button"
                   onClick={() => markAsPaid(order.id)}
-                  disabled={loadingId === order.id}
+                  disabled={loadingId === order.id || order.paymentStatus === "PAGO"}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.22)] transition-transform duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)] disabled:shadow-none"
                 >
                   <CheckCircle2 size={18} />
-                  {loadingId === order.id ? "Confirmando..." : "Marcar como pago"}
+                  {loadingId === order.id
+                    ? "Confirmando..."
+                    : order.paymentStatus === "PAGO"
+                      ? "Pagamento confirmado"
+                      : "Marcar como pago"}
                 </button>
               </div>
             </article>

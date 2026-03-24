@@ -18,7 +18,9 @@ export function buildOrderMessage(params: {
   const itemLines = params.items
     .map(
       (item) =>
-        `- ${item.name}\n  ${item.quantity}x ${formatCurrency(item.price)} = ${formatCurrency(item.subtotal)}`,
+        `- ${item.name}${
+          item.customizationText ? `\n  ${item.customizationText}` : ""
+        }\n  ${item.quantity}x ${formatCurrency(item.price)} = ${formatCurrency(item.subtotal)}`,
     )
     .join("\n\n");
 
@@ -53,9 +55,13 @@ export function buildOrderMessage(params: {
     `*ENTREGA*`,
     ...addressLines,
     "",
+    params.checkout.customerNote ? `*OBSERVACAO GERAL*\n${params.checkout.customerNote}\n` : null,
+    params.checkout.customerNote ? "" : null,
     `*PAGAMENTO*`,
     paymentLabels[params.checkout.paymentMethod],
-  ].join("\n");
+  ]
+    .filter((line): line is string => Boolean(line))
+    .join("\n");
 }
 
 export function buildWhatsAppUrl(message: string, whatsappNumber: string) {

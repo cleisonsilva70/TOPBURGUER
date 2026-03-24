@@ -48,17 +48,22 @@ export function CartPanel() {
         ) : (
           <div className="mt-6 space-y-4">
             {items.map((item) => (
-              <div key={item.id} className="panel-subtle p-4">
+              <div key={item.cartItemId} className="panel-subtle p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h4 className="font-bold">{item.name}</h4>
                     <p className="mt-1 text-sm text-[var(--muted)]">
                       {formatCurrency(item.price)} cada
                     </p>
+                    {item.customizationText ? (
+                      <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
+                        {item.customizationText}
+                      </p>
+                    ) : null}
                   </div>
                   <button
                     type="button"
-                    onClick={() => removeItem(item.id)}
+                    onClick={() => removeItem(item.cartItemId)}
                     className="text-[var(--danger)] transition-opacity hover:opacity-75"
                     aria-label={`Remover ${item.name}`}
                   >
@@ -70,7 +75,7 @@ export function CartPanel() {
                   <div className="glass-pill inline-flex items-center gap-2 rounded-full px-2 py-2">
                     <button
                       type="button"
-                      onClick={() => decreaseItem(item.id)}
+                      onClick={() => decreaseItem(item.cartItemId)}
                       className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[var(--foreground)]"
                     >
                       <Minus size={16} />
@@ -80,7 +85,7 @@ export function CartPanel() {
                     </span>
                     <button
                       type="button"
-                      onClick={() => increaseItem(item.id)}
+                      onClick={() => increaseItem(item.cartItemId)}
                       className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand)] text-white"
                     >
                       <Plus size={16} />
