@@ -4,6 +4,7 @@ import { Clock3, MapPin, MessageCircle, ShoppingBag } from "lucide-react";
 import { PromoBanners } from "@/components/home/promo-banners";
 import { formatDeliveryEstimate } from "@/lib/delivery";
 import { formatCurrency } from "@/lib/format";
+import { isInlineImage } from "@/lib/image-reference";
 import { listProducts } from "@/lib/order-repository";
 import { getResolvedStoreConfig } from "@/lib/white-label";
 import { MenuClient } from "./menu-client";
@@ -29,6 +30,7 @@ export async function StorefrontPage() {
                       fill
                       className="object-cover"
                       sizes="64px"
+                      unoptimized={isInlineImage(store.logoPath)}
                     />
                   </div>
                 ) : (

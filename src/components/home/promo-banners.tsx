@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { isInlineImage } from "@/lib/image-reference";
 import { getResolvedPromoBanners } from "@/lib/white-label";
 
 export async function PromoBanners() {
@@ -23,6 +24,7 @@ export async function PromoBanners() {
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 sizes="(max-width: 1024px) 100vw, 50vw"
+                unoptimized={isInlineImage(banner.imageUrl)}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-[rgba(20,11,7,0.85)] via-[rgba(20,11,7,0.46)] to-transparent" />
               <div className="absolute inset-0 flex flex-col justify-end p-6 text-white sm:p-8">

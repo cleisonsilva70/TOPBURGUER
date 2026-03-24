@@ -1,6 +1,3 @@
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { isOwnerAuthenticated } from "@/lib/auth";
 
@@ -11,10 +8,7 @@ const allowedMimeTypes = new Set([
   "image/webp",
   "image/svg+xml",
 ]);
-
-function sanitizeFileName(name: string) {
-  return name.replace(/[^a-zA-Z0-9.\-_]/g, "-").toLowerCase();
-}
+const maxFileSizeInBytes = 4 * 1024 * 1024;
 
 export async function POST(request: Request) {
   const isAuthenticated = await isOwnerAuthenticated();
@@ -39,15 +33,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Tipo de arquivo nao suportado." }, { status: 400 });
   }
 
+  if (file.size > maxFileSizeInBytes) {
+    return NextResponse.json(
+      { error: "A imagem deve ter no maximo 4 MB." },
+      { status: 400 },
+    );
+  }
+
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
-  const fileName = `${randomUUID()}-${sanitizeFileName(file.name)}`;
-  const directory = path.join(process.cwd(), "public", "uploads", scope);
-
-  await mkdir(directory, { recursive: true });
-  await writeFile(path.join(directory, fileName), buffer);
+  const base64 = buffer.toString("base64");
+  const url = `data:${file.type};base64,${base64}`;
 
   return NextResponse.json({
-    url: `/uploads/${scope}/${fileName}`,
+    scope,
+    url,
   });
 }

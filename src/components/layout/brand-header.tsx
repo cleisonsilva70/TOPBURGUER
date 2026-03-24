@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Clock3, Phone } from "lucide-react";
+import { isInlineImage } from "@/lib/image-reference";
 import { getResolvedStoreConfig } from "@/lib/white-label";
 
 export async function BrandHeader() {
@@ -20,6 +21,7 @@ export async function BrandHeader() {
                 fill
                 className="object-cover"
                 sizes="64px"
+                unoptimized={isInlineImage(store.logoPath)}
               />
             </div>
           ) : (

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isImageReference } from "@/lib/image-reference";
 
 const phoneDigitsSchema = z
   .string()
@@ -52,7 +53,10 @@ export const adminProductSchema = z.object({
   name: z.string().min(2, "Informe o nome do produto."),
   description: z.string().min(5, "Informe uma descricao curta."),
   price: z.coerce.number().positive("Informe um preco valido."),
-  imageUrl: z.string().url("Informe uma URL valida para a imagem."),
+  imageUrl: z
+    .string()
+    .trim()
+    .refine(isImageReference, "Informe uma imagem valida para o produto."),
   category: z.enum(["BURGERS", "COMBOS", "BEBIDAS", "ADICIONAIS"]),
   featured: z.coerce.boolean().default(false),
   active: z.coerce.boolean().default(true),
@@ -63,7 +67,12 @@ export const adminStoreSettingsSchema = z
     name: z.string().min(2, "Informe o nome da hamburgueria."),
     shortName: z.string().min(2, "Informe o nome curto."),
     logoText: z.string().min(1, "Informe as iniciais da marca.").max(4, "Use ate 4 caracteres."),
-    logoPath: z.string().optional().default(""),
+    logoPath: z
+      .string()
+      .trim()
+      .refine((value) => !value || isImageReference(value), "Informe uma imagem valida para a logo.")
+      .optional()
+      .default(""),
     phoneDisplay: z.string().min(8, "Informe o telefone exibido."),
     whatsappNumber: z.string().min(10, "Informe o WhatsApp no formato numerico."),
     address: z.string().min(5, "Informe o endereco."),
@@ -99,7 +108,10 @@ export const adminBannerSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(2, "Informe o titulo do banner."),
   description: z.string().min(5, "Informe a descricao do banner."),
-  imageUrl: z.string().url("Informe uma URL valida para a imagem do banner."),
+  imageUrl: z
+    .string()
+    .trim()
+    .refine(isImageReference, "Informe uma imagem valida para o banner."),
   ctaLabel: z.string().min(2, "Informe o texto do botao."),
   active: z.coerce.boolean().default(true),
 });

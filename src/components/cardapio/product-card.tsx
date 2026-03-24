@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ShoppingBag } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
+import { isInlineImage } from "@/lib/image-reference";
 import type { Product } from "@/lib/types";
 
 type ProductCardProps = {
@@ -21,6 +22,7 @@ export function ProductCard({ product, onAdd }: ProductCardProps) {
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, 33vw"
+          unoptimized={isInlineImage(product.imageUrl)}
         />
         {product.featured ? (
           <span className="absolute left-4 top-4 rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-[var(--foreground)]">

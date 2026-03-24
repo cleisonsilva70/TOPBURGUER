@@ -1,6 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState } from "react";
+import { CheckCircle2, UploadCloud } from "lucide-react";
+import { isInlineImage } from "@/lib/image-reference";
 
 type UploadFieldProps = {
   label: string;
@@ -63,17 +66,39 @@ export function UploadField({ label, scope, value, onChange }: UploadFieldProps)
           placeholder="Cole uma URL ou envie uma imagem"
         />
         <div className="flex flex-wrap items-center gap-3">
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/png,image/jpeg,image/webp,image/svg+xml"
-            onChange={handleFileSelect}
-            className="text-sm"
-          />
-          {uploading ? (
-            <span className="text-sm text-[var(--muted)]">Enviando...</span>
-          ) : null}
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm font-semibold text-[var(--foreground)] transition-colors hover:border-[var(--brand)] hover:text-[var(--brand)]">
+            <UploadCloud size={16} />
+            <span>{uploading ? "Enviando..." : "Selecionar imagem"}</span>
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </label>
+          <span className="text-xs leading-5 text-[var(--muted)]">
+            PNG, JPG, WEBP ou SVG com ate 4 MB.
+          </span>
         </div>
+        {value ? (
+          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-3">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--brand-strong)]">
+              <CheckCircle2 size={14} />
+              Imagem pronta para salvar
+            </div>
+            <div className="mt-3 overflow-hidden rounded-2xl border border-[var(--line)] bg-white">
+              <Image
+                src={value}
+                alt={label}
+                width={640}
+                height={320}
+                unoptimized={isInlineImage(value)}
+                className="h-40 w-full object-cover"
+              />
+            </div>
+          </div>
+        ) : null}
         {error ? (
           <p className="text-sm text-[var(--danger)]">{error}</p>
         ) : null}
