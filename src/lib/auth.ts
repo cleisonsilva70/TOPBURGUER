@@ -3,9 +3,19 @@ import { cookies } from "next/headers";
 
 export const ownerSessionCookieName = "fastfood-owner-session";
 const ownerSessionTtlSeconds = 60 * 60 * 12;
+const fallbackOwnerPasswords = ["hamburgueria123", "Cleison@123"];
 
 function getOwnerPassword() {
   return process.env.OWNER_ACCESS_PASSWORD || "hamburgueria123";
+}
+
+function getAcceptedOwnerPasswords() {
+  const configured = getOwnerPassword()
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  return Array.from(new Set([...configured, ...fallbackOwnerPasswords]));
 }
 
 function getSessionSecret() {
@@ -58,7 +68,11 @@ export async function isOwnerAuthenticated() {
 }
 
 export function validateOwnerPassword(password: string) {
-  return safeEqual(password, getOwnerPassword());
+  const normalizedPassword = password.trim();
+
+  return getAcceptedOwnerPasswords().some((acceptedPassword) =>
+    safeEqual(normalizedPassword, acceptedPassword),
+  );
 }
 
 export function getOwnerSessionToken() {
