@@ -362,18 +362,10 @@ export async function listKitchenOrders() {
 async function attachHostedPaymentIfAvailable(params: {
   order: PersistedOrder;
   checkout: CheckoutInput;
-  items: CartItem[];
-  deliveryFee: number;
-  storeName: string;
-  whatsappUrl: string;
 }) {
   const hostedPayment = await createHostedPaymentSession({
-    orderId: params.order.id,
     orderNumberFormatted: params.order.orderNumberFormatted,
-    storeName: params.storeName,
     checkout: params.checkout,
-    items: params.items,
-    deliveryFee: params.deliveryFee,
     total: Number(params.order.total),
   });
 
@@ -553,10 +545,6 @@ export async function createOrder(params: {
       ...params.checkout,
       deliveryArea: deliverySettings.deliveryArea,
     },
-    items: resolvedItems,
-    deliveryFee,
-    storeName: currentStoreConfig.name,
-    whatsappUrl,
   });
 
   return {

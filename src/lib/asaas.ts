@@ -1,4 +1,4 @@
-import type { CartItem, CheckoutInput, PaymentMethod } from "./types";
+import type { CheckoutInput, PaymentMethod } from "./types";
 
 export type HostedPaymentSession = {
   provider: "ASAAS";
@@ -7,13 +7,18 @@ export type HostedPaymentSession = {
 };
 
 type CreateHostedPaymentParams = {
-  orderId: string;
   orderNumberFormatted: string;
-  storeName: string;
   checkout: CheckoutInput;
-  items: CartItem[];
-  deliveryFee: number;
   total: number;
+};
+
+type AsaasCustomerResponse = {
+  id?: string;
+};
+
+type AsaasPaymentResponse = {
+  id?: string;
+  invoiceUrl?: string;
 };
 
 function getAsaasBaseUrl() {
@@ -28,13 +33,53 @@ function getAsaasBillingType(paymentMethod: PaymentMethod) {
       return "PIX";
     case "CARTAO_CREDITO":
       return "CREDIT_CARD";
+    case "CARTAO_DEBITO":
+      return "UNDEFINED";
     default:
       return null;
   }
 }
 
+function sanitizePhone(phone: string) {
+  return phone.replace(/\D/g, "");
+}
+
+function buildDueDateLabel() {
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 1);
+  return dueDate.toISOString().slice(0, 10);
+}
+
 export function isHostedPaymentEnabled() {
   return Boolean(process.env.ASAAS_API_KEY && process.env.APP_BASE_URL);
+}
+
+async function createAsaasCustomer(checkout: CheckoutInput) {
+  const response = await fetch(`${getAsaasBaseUrl()}/v3/customers`, {
+    method: "POST",
+    headers: {
+      access_token: process.env.ASAAS_API_KEY ?? "",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: checkout.customerName,
+      mobilePhone: sanitizePhone(checkout.phone),
+      notificationDisabled: false,
+    }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Asaas customer error: ${response.status} ${text}`);
+  }
+
+  const data = (await response.json()) as AsaasCustomerResponse;
+
+  if (!data.id) {
+    throw new Error("Asaas customer returned no id.");
+  }
+
+  return data.id;
 }
 
 export async function createHostedPaymentSession(
@@ -56,51 +101,43 @@ export async function createHostedPaymentSession(
     return null;
   }
 
-  const response = await fetch(`${getAsaasBaseUrl()}/v3/checkouts`, {
+  const customerId = await createAsaasCustomer(params.checkout);
+  const returnUrl = `${appBaseUrl}/pedido/${encodeURIComponent(params.orderNumberFormatted)}`;
+
+  const response = await fetch(`${getAsaasBaseUrl()}/v3/payments`, {
     method: "POST",
     headers: {
       access_token: process.env.ASAAS_API_KEY ?? "",
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      billingTypes: [billingType],
-      chargeTypes: ["DETACHED"],
-      minutesToExpire: 60,
-      items: [
-        ...params.items.map((item) => ({
-          name: item.name,
-          description: item.description,
-          quantity: item.quantity,
-          value: Number(item.price.toFixed(2)),
-        })),
-        ...(params.deliveryFee > 0
-          ? [
-              {
-                name: "Taxa de entrega",
-                description: "Entrega da hamburgueria",
-                quantity: 1,
-                value: Number(params.deliveryFee.toFixed(2)),
-              },
-            ]
-          : []),
-      ],
+      customer: customerId,
+      billingType,
+      value: Number(params.total.toFixed(2)),
+      dueDate: buildDueDateLabel(),
+      description: `Pedido ${params.orderNumberFormatted}`,
+      externalReference: params.orderNumberFormatted,
+      callback: {
+        successUrl: returnUrl,
+        autoRedirect: true,
+      },
     }),
   });
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Asaas checkout error: ${response.status} ${text}`);
+    throw new Error(`Asaas payment error: ${response.status} ${text}`);
   }
 
-  const data = (await response.json()) as { id?: string };
+  const data = (await response.json()) as AsaasPaymentResponse;
 
-  if (!data.id) {
-    throw new Error("Asaas checkout returned no id.");
+  if (!data.id || !data.invoiceUrl) {
+    throw new Error("Asaas payment returned incomplete data.");
   }
 
   return {
     provider: "ASAAS",
     externalId: data.id,
-    paymentUrl: `https://asaas.com/checkoutSession/show?id=${data.id}`,
+    paymentUrl: data.invoiceUrl,
   };
 }
