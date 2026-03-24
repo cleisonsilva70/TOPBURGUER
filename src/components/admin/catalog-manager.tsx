@@ -18,7 +18,7 @@ import {
 import { UploadField } from "@/components/admin/upload-field";
 import { formatCategoryLabel, orderStatusLabels } from "@/lib/constants";
 import { formatCurrency } from "@/lib/format";
-import type { OrderStatus, ProductCategory } from "@/lib/types";
+import type { OrderStatus, ProductCategory, StoreCategory } from "@/lib/types";
 
 type AdminProduct = {
   id: string;
@@ -96,6 +96,15 @@ type AdminOrder = {
   }>;
 };
 
+type AdminCategory = StoreCategory;
+
+type CategoryFormState = {
+  id: string;
+  name: string;
+  displayOrder: string;
+  active: boolean;
+};
+
 type PanelSection = "overview" | "store" | "products" | "banners" | "operation";
 
 const emptyProductForm = {
@@ -118,6 +127,13 @@ const emptyBannerForm: BannerFormState = {
   ctaMode: "LINK",
   ctaHref: "#cardapio",
   ctaProductId: "",
+  active: true,
+};
+
+const emptyCategoryForm: CategoryFormState = {
+  id: "",
+  name: "",
+  displayOrder: "1",
   active: true,
 };
 
@@ -241,10 +257,12 @@ function StatusNotice({
 export function CatalogManager() {
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [banners, setBanners] = useState<AdminBanner[]>([]);
+  const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [storeSettings, setStoreSettings] = useState<AdminStoreSettings | null>(null);
   const [productForm, setProductForm] = useState(emptyProductForm);
   const [bannerForm, setBannerForm] = useState(emptyBannerForm);
+  const [categoryForm, setCategoryForm] = useState(emptyCategoryForm);
   const [activeSection, setActiveSection] = useState<PanelSection>("overview");
   const [productSearch, setProductSearch] = useState("");
   const [orderSearch, setOrderSearch] = useState("");
@@ -290,6 +308,7 @@ export function CatalogManager() {
       setProducts(productsData);
       setStoreSettings(storeData.store);
       setBanners(storeData.banners);
+      setCategories(storeData.categories ?? []);
       setOrders(ordersData);
     } catch {
       setError("Falha ao carregar os dados do painel.");
@@ -308,6 +327,24 @@ export function CatalogManager() {
     }
   }, []);
 
+  useEffect(() => {
+    if (categories.length === 0) {
+      return;
+    }
+
+    setCategoryForm((current) =>
+      current.id || current.name
+        ? current
+        : { ...current, displayOrder: String(categories.length + 1) },
+    );
+
+    setProductForm((current) =>
+      current.category
+        ? current
+        : { ...current, category: categories[0]?.name ?? "" },
+    );
+  }, [categories]);
+
   const filteredProducts = useMemo(() => {
     const term = productSearch.trim().toLowerCase();
 
@@ -323,12 +360,6 @@ export function CatalogManager() {
       );
     });
   }, [productSearch, products]);
-
-  const availableCategories = useMemo(() => {
-    return Array.from(
-      new Set(products.map((product) => product.category.trim()).filter(Boolean)),
-    ).sort((left, right) => left.localeCompare(right, "pt-BR"));
-  }, [products]);
 
   const activeProductsCount = useMemo(
     () => products.filter((product) => product.active).length,
@@ -481,6 +512,50 @@ export function CatalogManager() {
     }
   }
 
+  async function handleCategorySubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const isEditing = Boolean(categoryForm.id);
+      const response = await fetch(
+        isEditing
+          ? `/api/admin/categories/${categoryForm.id}`
+          : "/api/admin/categories",
+        {
+          method: isEditing ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: categoryForm.name,
+            displayOrder: Number(categoryForm.displayOrder),
+            active: categoryForm.active,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error ?? "Nao foi possivel salvar a categoria.");
+        return;
+      }
+
+      setSuccess(isEditing ? "Categoria atualizada." : "Categoria criada.");
+      setCategoryForm({
+        ...emptyCategoryForm,
+        displayOrder: String((categories.length || 0) + 1),
+      });
+      await loadData();
+      setActiveSection("products");
+    } catch {
+      setError("Falha ao salvar a categoria.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function handleStoreSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -570,6 +645,18 @@ export function CatalogManager() {
       category: product.category,
       featured: product.featured,
       active: product.active,
+    });
+    setActiveSection("products");
+    setSuccess("");
+    setError("");
+  }
+
+  function startEditCategory(category: AdminCategory) {
+    setCategoryForm({
+      id: category.id,
+      name: category.name,
+      displayOrder: String(category.displayOrder),
+      active: category.active,
     });
     setActiveSection("products");
     setSuccess("");
@@ -1202,6 +1289,136 @@ export function CatalogManager() {
         <div className="grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
           <section className="panel-card luxury-section p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
+              Categorias
+            </p>
+            <h2 className="mt-2 text-3xl font-black uppercase">
+              Criar e ordenar categorias
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
+              Cadastre as categorias que devem aparecer no cardapio e defina a ordem em que elas vao aparecer para o cliente.
+            </p>
+
+            <form onSubmit={handleCategorySubmit} className="panel-subtle mt-8 space-y-5 p-5 sm:p-6">
+              <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_180px]">
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold">Nome da categoria</span>
+                  <input
+                    required
+                    value={categoryForm.name}
+                    onChange={(event) =>
+                      setCategoryForm((current) => ({
+                        ...current,
+                        name: event.target.value,
+                      }))
+                    }
+                    placeholder="Ex.: Pasteis, Burgers, Sobremesas"
+                    className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
+                  />
+                </label>
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold">Ordem</span>
+                  <input
+                    required
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={categoryForm.displayOrder}
+                    onChange={(event) =>
+                      setCategoryForm((current) => ({
+                        ...current,
+                        displayOrder: event.target.value,
+                      }))
+                    }
+                    className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
+                  />
+                </label>
+              </div>
+
+              <label className="inline-flex items-center gap-3 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={categoryForm.active}
+                  onChange={(event) =>
+                    setCategoryForm((current) => ({
+                      ...current,
+                      active: event.target.checked,
+                    }))
+                  }
+                />
+                Categoria ativa no cardapio
+              </label>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.2)] transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  {saving
+                    ? "Salvando..."
+                    : categoryForm.id
+                      ? "Atualizar categoria"
+                      : "Criar categoria"}
+                </button>
+                {categoryForm.id ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCategoryForm({
+                        ...emptyCategoryForm,
+                        displayOrder: String((categories.length || 0) + 1),
+                      })
+                    }
+                    className="glass-pill rounded-full px-6 py-4 text-sm font-bold uppercase tracking-[0.16em]"
+                  >
+                    Cancelar edicao
+                  </button>
+                ) : null}
+              </div>
+            </form>
+
+            <div className="mt-6 space-y-4">
+              {categories.length === 0 ? (
+                <div className="rounded-[22px] border border-dashed border-[var(--line)] bg-white/60 p-5 text-sm text-[var(--muted)]">
+                  Nenhuma categoria cadastrada ainda.
+                </div>
+              ) : (
+                categories.map((category) => (
+                  <article
+                    key={category.id}
+                    className="luxury-section rounded-[24px] border border-[var(--line)] bg-white/80 p-4"
+                  >
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-lg font-black">{formatCategoryLabel(category.name)}</h3>
+                          {!category.active ? (
+                            <span className="rounded-full bg-[var(--surface)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
+                              Inativa
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                          Ordem de exibicao: {category.displayOrder}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => startEditCategory(category)}
+                        className="glass-pill rounded-full px-4 py-3 text-sm font-bold uppercase tracking-[0.12em]"
+                      >
+                        Editar
+                      </button>
+                    </div>
+                  </article>
+                ))
+              )}
+            </div>
+          </section>
+
+          <section className="panel-card luxury-section p-6 sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
               Cadastro
             </p>
             <h2 className="mt-2 text-3xl font-black uppercase">
@@ -1264,9 +1481,7 @@ export function CatalogManager() {
 
                 <label className="block space-y-2">
                   <span className="text-sm font-semibold">Categoria</span>
-                  <input
-                    required
-                    list="product-categories"
+                  <select
                     value={productForm.category}
                     onChange={(event) =>
                       setProductForm((current) => ({
@@ -1274,14 +1489,20 @@ export function CatalogManager() {
                         category: event.target.value,
                       }))
                     }
-                    placeholder="Ex.: Burgers, Pasteis, Sobremesas"
                     className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
-                  />
-                  <datalist id="product-categories">
-                    {availableCategories.map((category) => (
-                      <option key={category} value={category} />
+                  >
+                    <option value="">Selecione uma categoria</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.name}>
+                        {formatCategoryLabel(category.name)}
+                      </option>
                     ))}
-                  </datalist>
+                  </select>
+                  {categories.length === 0 ? (
+                    <p className="text-xs leading-6 text-[var(--muted)]">
+                      Cadastre a categoria primeiro para depois vincular o produto.
+                    </p>
+                  ) : null}
                 </label>
               </div>
 
@@ -1327,7 +1548,7 @@ export function CatalogManager() {
               <div className="flex flex-wrap gap-3">
                 <button
                   type="submit"
-                  disabled={saving}
+                  disabled={saving || categories.length === 0}
                   className="rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.2)] transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   {saving

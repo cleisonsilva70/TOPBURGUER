@@ -19,6 +19,13 @@ export type DeliveryAreaRule = {
   active?: boolean;
 };
 
+export type StoreCategory = {
+  id: string;
+  name: string;
+  active: boolean;
+  displayOrder: number;
+};
+
 export type PromoBanner = {
   id: string;
   title: string;

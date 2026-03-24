@@ -63,6 +63,13 @@ export const adminProductSchema = z.object({
   active: z.coerce.boolean().default(true),
 });
 
+export const adminCategorySchema = z.object({
+  id: z.string().optional(),
+  name: z.string().trim().min(2, "Informe o nome da categoria."),
+  displayOrder: z.coerce.number().int().min(0).default(0),
+  active: z.coerce.boolean().default(true),
+});
+
 export const adminStoreSettingsSchema = z
   .object({
     name: z.string().min(2, "Informe o nome da hamburgueria."),

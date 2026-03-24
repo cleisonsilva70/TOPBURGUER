@@ -74,6 +74,30 @@ async function main() {
   });
 
   const banners = (await import("../data/banners.json")).default as PromoBanner[];
+  const categoryNames = Array.from(
+    new Set(products.map((product) => product.category.trim()).filter(Boolean)),
+  );
+
+  for (const [index, categoryName] of categoryNames.entries()) {
+    await prisma.storeCategory.upsert({
+      where: {
+        storeId_name: {
+          storeId: tenant.id,
+          name: categoryName,
+        },
+      },
+      update: {
+        active: true,
+        displayOrder: index + 1,
+      },
+      create: {
+        storeId: tenant.id,
+        name: categoryName,
+        active: true,
+        displayOrder: index + 1,
+      },
+    });
+  }
 
   for (const [index, banner] of banners.entries()) {
     await prisma.storeBanner.upsert({

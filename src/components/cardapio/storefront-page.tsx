@@ -5,13 +5,14 @@ import { PromoBanners } from "@/components/home/promo-banners";
 import { formatDeliveryEstimate } from "@/lib/delivery";
 import { formatCurrency } from "@/lib/format";
 import { isInlineImage } from "@/lib/image-reference";
-import { listProducts } from "@/lib/order-repository";
+import { listProducts, listStoreCategories } from "@/lib/order-repository";
 import { getResolvedStoreConfig } from "@/lib/white-label";
 import { MenuClient } from "./menu-client";
 
 export async function StorefrontPage() {
-  const [products, store] = await Promise.all([
+  const [products, categories, store] = await Promise.all([
     listProducts(),
+    listStoreCategories(),
     getResolvedStoreConfig(),
   ]);
 
@@ -169,7 +170,7 @@ export async function StorefrontPage() {
       </section>
 
       <PromoBanners />
-      <MenuClient products={products} />
+      <MenuClient products={products} categories={categories} />
     </main>
   );
 }

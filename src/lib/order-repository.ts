@@ -21,6 +21,7 @@ import type {
   OrderStatus,
   PaymentStatus,
   Product,
+  StoreCategory,
 } from "./types";
 
 const memoryOrders: Order[] = [];
@@ -88,6 +89,39 @@ type PersistedOrder = {
 type RequestedCartItem = Pick<CartItem, "id" | "quantity">;
 
 type ResolvedCartItem = CartItem;
+
+function normalizeCategoryName(value: string) {
+  return value.trim();
+}
+
+function sortProductsByCategories<T extends { category: string; name: string; displayOrder?: number }>(
+  items: T[],
+  categories: StoreCategory[],
+) {
+  const categoryOrder = new Map(
+    categories.map((category) => [normalizeCategoryName(category.name), category.displayOrder]),
+  );
+
+  return [...items].sort((left, right) => {
+    const leftCategoryOrder =
+      categoryOrder.get(normalizeCategoryName(left.category)) ?? Number.MAX_SAFE_INTEGER;
+    const rightCategoryOrder =
+      categoryOrder.get(normalizeCategoryName(right.category)) ?? Number.MAX_SAFE_INTEGER;
+
+    if (leftCategoryOrder !== rightCategoryOrder) {
+      return leftCategoryOrder - rightCategoryOrder;
+    }
+
+    const leftDisplayOrder = left.displayOrder ?? Number.MAX_SAFE_INTEGER;
+    const rightDisplayOrder = right.displayOrder ?? Number.MAX_SAFE_INTEGER;
+
+    if (leftDisplayOrder !== rightDisplayOrder) {
+      return leftDisplayOrder - rightDisplayOrder;
+    }
+
+    return left.name.localeCompare(right.name, "pt-BR");
+  });
+}
 
 function mapItems(items: CartItem[]): OrderItem[] {
   return items.map((item) => ({
@@ -294,28 +328,31 @@ export async function listProducts() {
     return products;
   }
 
-  const persistedProducts = await prisma.product.findMany({
-    where: {
-      storeId,
-      active: true,
-    },
-    orderBy: [{ displayOrder: "asc" }, { name: "asc" }],
-  });
+  const [persistedProducts, categories] = await Promise.all([
+    prisma.product.findMany({
+      where: {
+        storeId,
+        active: true,
+      },
+      orderBy: [{ displayOrder: "asc" }, { name: "asc" }],
+    }),
+    listStoreCategories(),
+  ]);
 
   if (persistedProducts.length === 0) {
     return products;
   }
 
-  return persistedProducts.map((product) => ({
+  return sortProductsByCategories(persistedProducts, categories).map((product) => ({
     id: product.id,
     name: product.name,
     description: product.description,
-      price: Number(product.price),
-      imageUrl: product.imageUrl,
-      category: product.category,
-      featured: product.featured,
-    }));
-  }
+    price: Number(product.price),
+    imageUrl: product.imageUrl,
+    category: product.category,
+    featured: product.featured,
+  }));
+}
 
 export async function listOrders() {
   if (!canUseDatabase()) {
@@ -557,21 +594,24 @@ export async function listAdminProducts() {
     return [];
   }
 
-  const items = await prisma.product.findMany({
-    where: { storeId },
-    orderBy: [{ displayOrder: "asc" }, { name: "asc" }],
-  });
+  const [items, categories] = await Promise.all([
+    prisma.product.findMany({
+      where: { storeId },
+      orderBy: [{ displayOrder: "asc" }, { name: "asc" }],
+    }),
+    listStoreCategories(),
+  ]);
 
-  return items.map((item) => ({
+  return sortProductsByCategories(items, categories).map((item) => ({
     id: item.id,
     name: item.name,
     description: item.description,
-      price: Number(item.price),
-      imageUrl: item.imageUrl,
-      category: item.category,
-      featured: item.featured,
-      active: item.active,
-      displayOrder: item.displayOrder,
+    price: Number(item.price),
+    imageUrl: item.imageUrl,
+    category: item.category,
+    featured: item.featured,
+    active: item.active,
+    displayOrder: item.displayOrder,
   }));
 }
 
@@ -601,27 +641,27 @@ export async function upsertAdminProduct(input: {
   const product = input.id
     ? await prisma.product.update({
         where: { id: input.id },
-        data: {
-          name: input.name,
-          description: input.description,
+          data: {
+            name: input.name,
+            description: input.description,
             price: input.price,
             imageUrl: input.imageUrl,
-            category: input.category.trim(),
+            category: normalizeCategoryName(input.category),
             featured: input.featured,
             active: input.active,
           },
-      })
+        })
     : await prisma.product.create({
         data: {
           storeId,
           name: input.name,
           description: input.description,
-            price: input.price,
-            imageUrl: input.imageUrl,
-            category: input.category.trim(),
-            featured: input.featured,
-            active: input.active,
-            displayOrder: displayOrder + 1,
+          price: input.price,
+          imageUrl: input.imageUrl,
+          category: normalizeCategoryName(input.category),
+          featured: input.featured,
+          active: input.active,
+          displayOrder: displayOrder + 1,
         },
       });
 
@@ -646,12 +686,16 @@ export async function getAdminStoreConfiguration() {
     throw new OrderFlowError("Loja principal nao encontrada.", 500);
   }
 
-  const [store, settings, banners] = await Promise.all([
+  const [store, settings, banners, categories] = await Promise.all([
     prisma.store.findUnique({ where: { id: storeId } }),
     prisma.storeSettings.findUnique({ where: { storeId } }),
     prisma.storeBanner.findMany({
       where: { storeId },
       orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+    }),
+    prisma.storeCategory.findMany({
+      where: { storeId },
+      orderBy: [{ displayOrder: "asc" }, { name: "asc" }],
     }),
   ]);
 
@@ -699,6 +743,12 @@ export async function getAdminStoreConfiguration() {
       ctaProductId: banner.ctaProductId ?? "",
       active: banner.active,
       displayOrder: banner.displayOrder,
+    })),
+    categories: categories.map((category) => ({
+      id: category.id,
+      name: category.name,
+      active: category.active,
+      displayOrder: category.displayOrder,
     })),
   };
 }
@@ -831,6 +881,111 @@ export async function upsertAdminBanner(input: {
     active: banner.active,
     displayOrder: banner.displayOrder,
   };
+}
+
+export async function upsertAdminCategory(input: {
+  id?: string;
+  name: string;
+  displayOrder: number;
+  active: boolean;
+}) {
+  const storeId = await getCurrentStoreId();
+
+  if (!storeId) {
+    throw new OrderFlowError("Loja principal nao encontrada para editar categorias.", 500);
+  }
+
+  const name = normalizeCategoryName(input.name);
+
+  const existingCategory = await prisma.storeCategory.findFirst({
+    where: {
+      storeId,
+      name,
+      ...(input.id ? { NOT: { id: input.id } } : {}),
+    },
+  });
+
+  if (existingCategory) {
+    throw new OrderFlowError("Ja existe uma categoria com esse nome.", 400);
+  }
+
+  const category = input.id
+    ? await prisma.$transaction(async (tx) => {
+        const currentCategory = await tx.storeCategory.findUnique({
+          where: { id: input.id },
+        });
+
+        if (!currentCategory) {
+          throw new OrderFlowError("Categoria nao encontrada.", 404);
+        }
+
+        const updatedCategory = await tx.storeCategory.update({
+          where: { id: input.id },
+          data: {
+            name,
+            displayOrder: input.displayOrder,
+            active: input.active,
+          },
+        });
+
+        if (currentCategory.name !== name) {
+          await tx.product.updateMany({
+            where: {
+              storeId,
+              category: currentCategory.name,
+            },
+            data: {
+              category: name,
+            },
+          });
+        }
+
+        return updatedCategory;
+      })
+    : await prisma.storeCategory.create({
+        data: {
+          storeId,
+          name,
+          displayOrder: input.displayOrder,
+          active: input.active,
+        },
+      });
+
+  return {
+    id: category.id,
+    name: category.name,
+    active: category.active,
+    displayOrder: category.displayOrder,
+  };
+}
+
+export async function listStoreCategories() {
+  const storeId = await getCurrentStoreId();
+
+  if (!process.env.DATABASE_URL || !storeId) {
+    const fallbackNames = Array.from(
+      new Set(products.map((product) => normalizeCategoryName(product.category)).filter(Boolean)),
+    );
+
+    return fallbackNames.map((name, index) => ({
+      id: `fallback-category-${index + 1}`,
+      name,
+      active: true,
+      displayOrder: index + 1,
+    }));
+  }
+
+  const categories = await prisma.storeCategory.findMany({
+    where: { storeId },
+    orderBy: [{ displayOrder: "asc" }, { name: "asc" }],
+  });
+
+  return categories.map((category) => ({
+    id: category.id,
+    name: category.name,
+    active: category.active,
+    displayOrder: category.displayOrder,
+  }));
 }
 
 export async function updateOrderStatus(id: string, status: OrderStatus) {

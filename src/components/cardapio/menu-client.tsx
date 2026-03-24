@@ -4,24 +4,45 @@ import { useMemo, useState } from "react";
 import { CartPanel } from "@/components/carrinho/cart-panel";
 import { SectionTitle } from "@/components/ui/section-title";
 import { formatCategoryLabel } from "@/lib/constants";
-import type { Product } from "@/lib/types";
+import type { Product, StoreCategory } from "@/lib/types";
 import { useCartStore } from "@/store/cart-store";
 import { ProductCard } from "./product-card";
 
-export function MenuClient({ products }: { products: Product[] }) {
+export function MenuClient({
+  products,
+  categories,
+}: {
+  products: Product[];
+  categories: StoreCategory[];
+}) {
   const addItem = useCartStore((state) => state.addItem);
   const items = useCartStore((state) => state.items);
   const [activeCategory, setActiveCategory] = useState<string>("TODOS");
 
-  const categories = useMemo(() => {
+  const visibleCategories = useMemo(() => {
+    const categoryOrder = new Map(
+      categories
+        .filter((category) => category.active)
+        .map((category) => [category.name.trim(), category.displayOrder]),
+    );
+
     return Array.from(
       new Set(
         products
           .map((product) => product.category.trim())
           .filter(Boolean),
       ),
-    );
-  }, [products]);
+    ).sort((left, right) => {
+      const leftOrder = categoryOrder.get(left) ?? Number.MAX_SAFE_INTEGER;
+      const rightOrder = categoryOrder.get(right) ?? Number.MAX_SAFE_INTEGER;
+
+      if (leftOrder !== rightOrder) {
+        return leftOrder - rightOrder;
+      }
+
+      return left.localeCompare(right, "pt-BR");
+    });
+  }, [categories, products]);
 
   const filteredProducts = useMemo(() => {
     if (activeCategory === "TODOS") {
@@ -54,7 +75,7 @@ export function MenuClient({ products }: { products: Product[] }) {
           >
             Todos
           </button>
-          {categories.map((category) => (
+          {visibleCategories.map((category) => (
             <button
               key={category}
               type="button"
