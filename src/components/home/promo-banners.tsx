@@ -1,5 +1,7 @@
+import Link from "next/link";
 import Image from "next/image";
 import { isInlineImage } from "@/lib/image-reference";
+import { isHttpUrl } from "@/lib/links";
 import { getResolvedPromoBanners } from "@/lib/white-label";
 
 export async function PromoBanners() {
@@ -37,9 +39,23 @@ export async function PromoBanners() {
                 <p className="mt-3 max-w-xl text-sm leading-7 text-white/85">
                   {banner.description}
                 </p>
-                <span className="mt-5 inline-flex w-fit rounded-full bg-[var(--accent)] px-4 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] shadow-[0_16px_34px_rgba(0,0,0,0.18)]">
-                  {banner.ctaLabel}
-                </span>
+                {isHttpUrl(banner.ctaHref ?? "#cardapio") ? (
+                  <a
+                    href={banner.ctaHref ?? "#cardapio"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-5 inline-flex w-fit rounded-full bg-[var(--accent)] px-4 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] shadow-[0_16px_34px_rgba(0,0,0,0.18)] transition-transform duration-200 hover:-translate-y-0.5"
+                  >
+                    {banner.ctaLabel}
+                  </a>
+                ) : (
+                  <Link
+                    href={banner.ctaHref ?? "#cardapio"}
+                    className="mt-5 inline-flex w-fit rounded-full bg-[var(--accent)] px-4 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] shadow-[0_16px_34px_rgba(0,0,0,0.18)] transition-transform duration-200 hover:-translate-y-0.5"
+                  >
+                    {banner.ctaLabel}
+                  </Link>
+                )}
               </div>
             </div>
           </article>

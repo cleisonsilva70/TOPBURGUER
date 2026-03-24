@@ -38,6 +38,7 @@ type AdminBanner = {
   description: string;
   imageUrl: string;
   ctaLabel: string;
+  ctaHref: string;
   active: boolean;
   displayOrder: number;
 };
@@ -100,6 +101,7 @@ const emptyBannerForm = {
   description: "",
   imageUrl: "",
   ctaLabel: "",
+  ctaHref: "#cardapio",
   active: true,
 };
 
@@ -510,6 +512,7 @@ export function CatalogManager() {
             description: bannerForm.description,
             imageUrl: bannerForm.imageUrl,
             ctaLabel: bannerForm.ctaLabel,
+            ctaHref: bannerForm.ctaHref,
             active: bannerForm.active,
           }),
         },
@@ -553,11 +556,12 @@ export function CatalogManager() {
     setBannerForm({
       id: banner.id,
       title: banner.title,
-      description: banner.description,
-      imageUrl: banner.imageUrl,
-      ctaLabel: banner.ctaLabel,
-      active: banner.active,
-    });
+        description: banner.description,
+        imageUrl: banner.imageUrl,
+        ctaLabel: banner.ctaLabel,
+        ctaHref: banner.ctaHref,
+        active: banner.active,
+      });
     setActiveSection("banners");
     setSuccess("");
     setError("");
@@ -1459,6 +1463,23 @@ export function CatalogManager() {
                   className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
                 />
               </label>
+              <label className="block space-y-2">
+                <span className="text-sm font-semibold">Destino do botao</span>
+                <input
+                  value={bannerForm.ctaHref}
+                  onChange={(event) =>
+                    setBannerForm((current) => ({
+                      ...current,
+                      ctaHref: event.target.value,
+                    }))
+                  }
+                  placeholder="#cardapio, /checkout ou https://..."
+                  className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
+                />
+                <p className="text-xs leading-6 text-[var(--muted)]">
+                  Use <strong>#cardapio</strong> para rolar ate os produtos, <strong>/checkout</strong> para abrir o checkout, ou um link completo como <strong>https://wa.me/...</strong>.
+                </p>
+              </label>
               <label className="inline-flex items-center gap-3 text-sm font-semibold">
                 <input
                   type="checkbox"
@@ -1530,6 +1551,9 @@ export function CatalogManager() {
                         </p>
                         <p className="mt-2 text-sm font-semibold text-[var(--brand)]">
                           {banner.ctaLabel}
+                        </p>
+                        <p className="mt-1 break-all text-xs text-[var(--muted)]">
+                          {banner.ctaHref || "#cardapio"}
                         </p>
                       </div>
                       <button

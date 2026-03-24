@@ -82,6 +82,7 @@ model StoreBanner {
   description String
   imageUrl    String
   ctaLabel    String
+  ctaHref     String?
   active      Boolean  @default(true)
   displayOrder Int     @default(0)
   createdAt   DateTime @default(now())

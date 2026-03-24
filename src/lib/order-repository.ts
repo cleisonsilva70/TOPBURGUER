@@ -694,6 +694,7 @@ export async function getAdminStoreConfiguration() {
       description: banner.description,
       imageUrl: banner.imageUrl,
       ctaLabel: banner.ctaLabel,
+      ctaHref: banner.ctaHref ?? "#cardapio",
       active: banner.active,
       displayOrder: banner.displayOrder,
     })),
@@ -769,6 +770,7 @@ export async function upsertAdminBanner(input: {
   description: string;
   imageUrl: string;
   ctaLabel: string;
+  ctaHref?: string;
   active: boolean;
 }) {
   const storeId = await getCurrentStoreId();
@@ -792,6 +794,7 @@ export async function upsertAdminBanner(input: {
           description: input.description,
           imageUrl: input.imageUrl,
           ctaLabel: input.ctaLabel,
+          ctaHref: input.ctaHref || "#cardapio",
           active: input.active,
         },
       })
@@ -802,6 +805,7 @@ export async function upsertAdminBanner(input: {
           description: input.description,
           imageUrl: input.imageUrl,
           ctaLabel: input.ctaLabel,
+          ctaHref: input.ctaHref || "#cardapio",
           active: input.active,
           displayOrder: displayOrder + 1,
         },
@@ -813,6 +817,7 @@ export async function upsertAdminBanner(input: {
     description: banner.description,
     imageUrl: banner.imageUrl,
     ctaLabel: banner.ctaLabel,
+    ctaHref: banner.ctaHref ?? "#cardapio",
     active: banner.active,
     displayOrder: banner.displayOrder,
   };

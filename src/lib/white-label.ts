@@ -5,7 +5,7 @@ import productsData from "../../data/products.json";
 import storeData from "../../data/store.json";
 import { parseDeliveryAreasJson } from "./delivery";
 import { prisma } from "./prisma";
-import type { DeliveryAreaRule, PaymentMethod, Product } from "./types";
+import type { DeliveryAreaRule, PaymentMethod, Product, PromoBanner } from "./types";
 
 export type StoreConfig = {
   name: string;
@@ -34,15 +34,6 @@ export type BrandingConfig = {
   heroDescription: string;
   eyebrow: string;
   tagline: string;
-};
-
-export type PromoBanner = {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  ctaLabel: string;
-  active?: boolean;
 };
 
 export function getStoreConfig() {
@@ -165,6 +156,7 @@ export async function getResolvedPromoBanners() {
     description: banner.description,
     imageUrl: banner.imageUrl,
     ctaLabel: banner.ctaLabel,
+    ctaHref: banner.ctaHref ?? "#cardapio",
     active: banner.active,
   }));
 }

@@ -19,6 +19,16 @@ export type DeliveryAreaRule = {
   active?: boolean;
 };
 
+export type PromoBanner = {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  ctaLabel: string;
+  ctaHref?: string;
+  active?: boolean;
+};
+
 export type Product = {
   id: string;
   name: string;

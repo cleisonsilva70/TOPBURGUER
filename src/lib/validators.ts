@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isImageReference } from "@/lib/image-reference";
+import { isBannerLink } from "@/lib/links";
 
 const phoneDigitsSchema = z
   .string()
@@ -113,5 +114,10 @@ export const adminBannerSchema = z.object({
     .trim()
     .refine(isImageReference, "Informe uma imagem valida para o banner."),
   ctaLabel: z.string().min(2, "Informe o texto do botao."),
+  ctaHref: z
+    .string()
+    .trim()
+    .refine((value) => !value || isBannerLink(value), "Informe um link valido para o botao.")
+    .default("#cardapio"),
   active: z.coerce.boolean().default(true),
 });
