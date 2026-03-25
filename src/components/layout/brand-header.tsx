@@ -46,7 +46,7 @@ export async function BrandHeader() {
           <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[430px]">
             <div className="glass-pill rounded-[24px] px-4 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--brand-strong)]">
-                Contato da loja
+                WhatsApp de pedidos
               </p>
               <div className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
                 <Phone size={16} />

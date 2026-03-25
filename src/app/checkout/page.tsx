@@ -16,7 +16,7 @@ export default async function CheckoutPage() {
               Finalizar pedido
             </p>
             <h1 className="mt-2 text-3xl font-black uppercase tracking-[-0.04em] sm:text-4xl">
-              Falta pouco para enviar para a loja
+              Falta pouco para enviar seu pedido
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)] sm:text-base">
               Confira seus dados de entrega, escolha como vai pagar e avance para

@@ -176,8 +176,8 @@ export function CheckoutForm({
             Falta so confirmar sua entrega
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)] sm:text-base">
-            Preencha seus dados para a loja receber o pedido certinho e agilizar
-            seu atendimento.
+            Preencha seus dados para a equipe receber seu pedido certinho e
+            agilizar o preparo.
           </p>
 
           <div className="mt-4 flex flex-wrap gap-3">
@@ -201,7 +201,7 @@ export function CheckoutForm({
               required
               value={formData.customerName}
               onChange={(event) => updateField("customerName", event.target.value)}
-              placeholder="Como a loja deve te chamar"
+              placeholder="Como a equipe deve te chamar"
               className={`w-full rounded-2xl border bg-white/88 px-4 py-3 outline-none transition-colors focus:border-[var(--brand)] ${
                 fieldErrors.customerName
                   ? "border-[var(--danger)]"
@@ -371,7 +371,7 @@ export function CheckoutForm({
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm leading-6 text-[var(--muted)]">
-            Voce ainda revisa tudo antes de enviar para a loja.
+            Voce ainda revisa tudo antes de enviar para a equipe.
           </p>
           <button
             type="submit"

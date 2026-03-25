@@ -54,7 +54,7 @@ export async function StorefrontPage() {
               </h2>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)] sm:text-base">
                 Escolha seus burgers, combos e bebidas, confira a entrega e envie o
-                pedido para a loja em poucos toques.
+                pedido para a equipe em poucos toques.
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
@@ -103,7 +103,7 @@ export async function StorefrontPage() {
                     </h2>
                     <p className="mt-2 text-sm leading-6 text-white/74">
                       Escolha os itens, informe a entrega e confirme. O pedido chega
-                      para a loja no WhatsApp e segue para atendimento.
+                      no WhatsApp da equipe e segue para atendimento.
                     </p>
                     <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
                       {store.deliveryAreas.length > 0
@@ -116,7 +116,7 @@ export async function StorefrontPage() {
                     {[
                       ["1", "Escolha seus itens"],
                       ["2", "Confirme a entrega"],
-                      ["3", "Envie para a loja"],
+                      ["3", "Envie seu pedido"],
                     ].map(([step, label]) => (
                       <div
                         key={step}

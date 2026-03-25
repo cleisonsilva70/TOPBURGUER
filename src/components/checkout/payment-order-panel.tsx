@@ -176,8 +176,8 @@ export function PaymentOrderPanel({
               Acompanhe a confirmacao do seu pedido
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)]">
-              Aqui voce confirma o pagamento e acompanha a liberacao para a equipe da
-              loja. Assim o preparo so comeca quando estiver tudo certo.
+              Aqui voce confirma o pagamento e acompanha a liberacao para a equipe.
+              Assim o preparo so comeca quando estiver tudo certo.
             </p>
           </div>
 
@@ -195,7 +195,7 @@ export function PaymentOrderPanel({
             </div>
             <p className="mt-4 text-sm leading-6 text-white/72">
               Depois da confirmacao, o pedido segue para o atendimento e entra no
-              fluxo interno da loja.
+              fluxo interno da operacao.
             </p>
           </div>
         </div>
@@ -234,13 +234,13 @@ export function PaymentOrderPanel({
 
           <div className="rounded-[30px] border border-[var(--line)] bg-[linear-gradient(180deg,var(--surface-dark),#1b100b)] p-6 text-white sm:p-7">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
-              Fluxo da loja
+              Fluxo do pedido
             </p>
             <h2 className="mt-3 text-2xl font-black uppercase">
               O preparo so comeca depois da confirmacao
             </h2>
             <p className="mt-4 text-sm leading-7 text-white/72">
-              Assim a loja trabalha apenas com pedido confirmado. Depois do
+              Assim a equipe trabalha apenas com pedido confirmado. Depois do
               pagamento, o atendimento libera e a cozinha recebe como novo.
             </p>
 
@@ -261,7 +261,7 @@ export function PaymentOrderPanel({
                   <br />
                   2. O sistema marca o pedido como pago.
                   <br />
-                  3. O WhatsApp abre para a loja receber a mensagem.
+                  3. O WhatsApp abre para a equipe receber a mensagem.
                   <br />
                   4. A cozinha passa a enxergar o pedido.
                 </>

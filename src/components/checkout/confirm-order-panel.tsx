@@ -139,7 +139,7 @@ export function ConfirmOrderPanel() {
         </p>
         <h1 className="mt-3 text-4xl font-black uppercase">Pedido nao encontrado</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--muted)]">
-          Volte ao checkout e monte seu pedido novamente antes de enviar para a loja.
+          Volte ao checkout e monte seu pedido novamente antes de enviar para a equipe.
         </p>
         <div className="mt-8">
           <Link
@@ -165,7 +165,7 @@ export function ConfirmOrderPanel() {
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)] sm:text-[1.02rem]">
             Confira seus dados, os itens e o total. Quando voce confirmar, o
-            pedido segue para a loja e entra no atendimento.
+            pedido segue para o atendimento e entra na fila de preparo.
           </p>
         </div>
 
@@ -279,7 +279,7 @@ export function ConfirmOrderPanel() {
             className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.26)] transition-transform duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)] disabled:shadow-none"
           >
             <MessageCircleMore size={18} />
-            {isSubmitting ? "Enviando pedido..." : "Enviar pedido para a loja"}
+            {isSubmitting ? "Enviando pedido..." : "Enviar pedido"}
           </button>
         <button
           type="button"
