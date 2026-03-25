@@ -14,6 +14,7 @@ import {
   Search,
   ShoppingBag,
   Store,
+  Trash2,
 } from "lucide-react";
 import { UploadField } from "@/components/admin/upload-field";
 import { formatCategoryLabel, orderStatusLabels } from "@/lib/constants";
@@ -297,6 +298,7 @@ export function CatalogManager() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [resettingOrders, setResettingOrders] = useState(false);
 
   async function loadData() {
     setLoading(true);
@@ -726,6 +728,45 @@ export function CatalogManager() {
     setActiveSection("banners");
     setSuccess("");
     setError("");
+  }
+
+  async function resetAllOrderHistory() {
+    const confirmed = window.confirm(
+      "Isso vai apagar todo o historico de pedidos e reiniciar a numeracao. Deseja continuar?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setResettingOrders(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await fetch("/api/pedidos/reset", {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error ?? "Nao foi possivel limpar o historico de pedidos.");
+        return;
+      }
+
+      setOrders([]);
+      setOrderSearch("");
+      setHistoryStatusFilter("TODOS");
+      setSuccess(
+        data.cleared > 0
+          ? `${data.cleared} pedidos removidos do historico com sucesso.`
+          : "Historico de pedidos ja estava vazio.",
+      );
+    } catch {
+      setError("Falha ao limpar todo o historico de pedidos.");
+    } finally {
+      setResettingOrders(false);
+    }
   }
 
   return (
@@ -2162,12 +2203,23 @@ export function CatalogManager() {
                   Historico completo de pedidos
                 </h2>
               </div>
-              <Link
-                href="/cozinha"
-                className="inline-flex items-center justify-center rounded-full border border-[var(--line)] bg-white px-5 py-3 text-sm font-bold uppercase tracking-[0.14em]"
-              >
-                Abrir painel da cozinha
-              </Link>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => void resetAllOrderHistory()}
+                  disabled={resettingOrders || orders.length === 0}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(179,63,47,0.2)] bg-[rgba(179,63,47,0.08)] px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--danger)] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Trash2 size={16} />
+                  {resettingOrders ? "Limpando..." : "Resetar historico"}
+                </button>
+                <Link
+                  href="/cozinha"
+                  className="inline-flex items-center justify-center rounded-full border border-[var(--line)] bg-white px-5 py-3 text-sm font-bold uppercase tracking-[0.14em]"
+                >
+                  Abrir painel da cozinha
+                </Link>
+              </div>
             </div>
 
             <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

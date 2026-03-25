@@ -24,8 +24,11 @@ export function GlobalDateTime() {
   }, []);
 
   return (
-    <div className="fixed left-3 top-3 z-[60] sm:left-5 sm:top-5">
-      <div className="flex items-center gap-3 rounded-[18px] border border-white/45 bg-white/78 px-3 py-2 shadow-[0_14px_34px_rgba(35,21,15,0.12)] backdrop-blur md:px-4">
+    <div
+      className="pointer-events-none fixed left-3 top-3 z-[120] sm:left-5 sm:top-5"
+      style={{ top: "max(0.75rem, env(safe-area-inset-top))" }}
+    >
+      <div className="flex items-center gap-3 rounded-[18px] border border-white/45 bg-white/88 px-3 py-2 shadow-[0_16px_40px_rgba(35,21,15,0.16)] backdrop-blur md:px-4">
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--brand-strong)] sm:text-[11px]">
           {current.date}
         </p>

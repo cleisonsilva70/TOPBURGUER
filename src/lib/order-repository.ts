@@ -1257,6 +1257,36 @@ export async function clearKitchenDeliveredOrders() {
   return { cleared: result.count };
 }
 
+export async function clearAllOrdersHistory() {
+  if (!canUseDatabase()) {
+    const cleared = memoryOrders.length;
+    memoryOrders.splice(0, memoryOrders.length);
+    return { cleared };
+  }
+
+  const storeId = await getCurrentStoreId();
+
+  if (!storeId) {
+    throw new OrderFlowError("Loja principal nao encontrada.", 500);
+  }
+
+  const result = await prisma.$transaction(async (tx) => {
+    const deletedOrders = await tx.order.deleteMany({
+      where: { storeId },
+    });
+
+    await tx.orderCounter.upsert({
+      where: { key: "orders" },
+      update: { value: 0 },
+      create: { key: "orders", value: 0 },
+    });
+
+    return deletedOrders.count;
+  });
+
+  return { cleared: result };
+}
+
 export async function confirmOrderPaymentByExternalId(externalId: string) {
   if (!canUseDatabase()) {
     return null;
