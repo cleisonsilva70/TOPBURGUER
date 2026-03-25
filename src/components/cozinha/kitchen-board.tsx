@@ -429,55 +429,71 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                     <article
                       key={order.id}
                       className={cn(
-                        "luxury-section relative overflow-hidden rounded-[24px] border bg-white p-4 shadow-[0_12px_30px_rgba(46,23,12,0.06)]",
+                        "panel-card luxury-section relative overflow-hidden p-6",
                         "min-h-[420px]",
                         isFresh
                           ? "border-[var(--brand)] shadow-[0_0_0_2px_rgba(184,68,31,0.12)]"
                           : isDelayed
                             ? "border-[rgba(179,63,47,0.24)]"
                             : "border-[var(--line)]",
-                        isDelivered ? "bg-[rgba(255,255,255,0.76)]" : "",
+                        isDelivered ? "bg-[rgba(255,255,255,0.78)]" : "",
                       )}
                     >
-                      <div className="absolute right-0 top-0 h-20 w-20 rounded-full bg-[color-mix(in_srgb,var(--accent)_28%,transparent)] blur-2xl" />
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-[color-mix(in_srgb,var(--accent)_32%,transparent)] blur-2xl" />
+                      <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
                             Pedido {order.orderNumberFormatted}
                           </p>
+                          <h3 className="mt-2 text-2xl font-black">{order.customerName}</h3>
                           <p className="mt-1 text-sm text-[var(--muted)]">
-                            Horario: {order.displayTime}
+                            {order.displayTime} | {orderStatusLabels[order.status]}
                           </p>
-                          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
-                            {isDelivered ? "Pedido finalizado" : `${ageInMinutes} min`}
-                          </p>
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <strong className="rounded-full bg-[var(--surface-strong)] px-3 py-2 text-xs uppercase tracking-[0.2em] text-[var(--foreground)]">
-                            {orderStatusLabels[order.status]}
-                          </strong>
                           {isFresh ? (
-                            <span className="rounded-full bg-[var(--accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--foreground)]">
-                              Novo agora
-                            </span>
+                            <p className="mt-2 inline-flex rounded-full bg-[var(--accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--foreground)]">
+                              Pedido novo
+                            </p>
                           ) : null}
                           {isDelayed ? (
-                            <span className="rounded-full bg-[rgba(179,63,47,0.12)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--danger)]">
-                              Prioridade
-                            </span>
+                            <p className="mt-2 inline-flex rounded-full bg-[rgba(179,63,47,0.12)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--danger)]">
+                              Prioridade ha {ageInMinutes} min
+                            </p>
+                          ) : null}
+                          {!isDelayed && !isFresh ? (
+                            <p className="mt-2 inline-flex rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
+                              {isDelivered ? "Pedido finalizado" : `${ageInMinutes} min de operacao`}
+                            </p>
                           ) : null}
                         </div>
+                        <span className="glass-pill rounded-full px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[var(--foreground)]">
+                          {orderStatusLabels[order.status]}
+                        </span>
                       </div>
 
-                      <div className="mt-4">
-                        <h3 className="text-lg font-black">{order.customerName}</h3>
+                      <div className="mt-5 grid gap-4">
+                        <div className="panel-subtle p-4 text-sm leading-7 text-[var(--muted)]">
+                          <p>
+                            <strong className="text-[var(--foreground)]">Horario:</strong> {order.displayTime}
+                          </p>
+                          <p>
+                            <strong className="text-[var(--foreground)]">Status:</strong> {orderStatusLabels[order.status]}
+                          </p>
+                          <p>
+                            <strong className="text-[var(--foreground)]">Tempo:</strong> {isDelivered ? "Pedido finalizado" : `${ageInMinutes} min`}
+                          </p>
+                        </div>
+
                         {isDelivered ? (
-                          <div className="mt-3 rounded-[18px] border border-[var(--line)] bg-[var(--surface)] px-4 py-4 text-sm leading-6 text-[var(--muted)]">
+                          <div className="rounded-[22px] border border-[var(--line)] bg-[var(--surface)] px-4 py-4 text-sm leading-6 text-[var(--muted)]">
                             <p>{order.items.length} item(ns) finalizados neste pedido.</p>
                             <p className="mt-1">Pedido concluido e pronto para sair da tela quando desejar.</p>
                           </div>
                         ) : (
-                          <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--foreground)]">
+                          <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(35,21,15,0.98),rgba(57,31,21,0.92))] p-4 text-white shadow-[0_18px_38px_rgba(35,21,15,0.18)]">
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
+                              Itens
+                            </p>
+                            <ul className="mt-3 space-y-2 text-sm leading-6 text-white/85">
                             {order.items.map((item) => (
                               <li key={item.id}>
                                 {"\u2022"} {item.productName}
@@ -486,20 +502,17 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                                 {formatCurrency(item.subtotal)}
                               </li>
                             ))}
-                          </ul>
+                            </ul>
+                          </div>
                         )}
                       </div>
 
-                      <div className="mt-4 flex items-center justify-between rounded-[18px] bg-[var(--surface)] px-4 py-3">
-                        <span className="text-sm text-[var(--muted)]">
-                          Total
-                        </span>
-                        <strong className="text-lg text-[var(--brand)]">
-                          {formatCurrency(order.total)}
-                        </strong>
+                      <div className="mt-5 flex items-center justify-between rounded-[18px] bg-[var(--surface)] px-4 py-3">
+                        <span className="text-sm text-[var(--muted)]">Total do pedido</span>
+                        <strong className="text-lg text-[var(--brand)]">{formatCurrency(order.total)}</strong>
                       </div>
 
-                      <div className="mt-4">
+                      <div className="mt-5">
                         <button
                           type="button"
                           disabled={!action.nextStatus || loadingId === order.id}
