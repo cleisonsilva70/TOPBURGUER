@@ -357,7 +357,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
         </section>
       ) : null}
 
-      <section className="overflow-x-auto pb-2">
+      <section>
         <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <label className="relative block w-full max-w-md">
             <Search
@@ -380,7 +380,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
             </div>
           </div>
         </div>
-        <div className="grid min-w-[1240px] grid-cols-4 gap-5">
+        <div className="grid gap-5 xl:grid-cols-2 2xl:grid-cols-4">
           {orderStatusSequence.map((status) => (
             <div
               key={status}
@@ -432,7 +432,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                       key={order.id}
                       className={cn(
                         "panel-card luxury-section relative overflow-hidden p-6",
-                        "min-h-[420px]",
+                        "min-h-[360px]",
                         isFresh
                           ? "border-[var(--brand)] shadow-[0_0_0_2px_rgba(184,68,31,0.12)]"
                           : isDelayed
