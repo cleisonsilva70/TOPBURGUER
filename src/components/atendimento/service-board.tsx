@@ -4,7 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Search } from "lucide-react";
-import { formatCurrency } from "@/lib/format";
+import {
+  formatCurrency,
+  formatDateInputValue,
+  formatMonthInputValue,
+  formatYearValue,
+} from "@/lib/format";
 import { paymentLabels, paymentStatusLabels } from "@/lib/constants";
 import type { Order, PaymentMethod } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -83,7 +88,7 @@ function matchesSelectedDateFilter(
   const createdAt = new Date(createdAtValue);
 
   if (dateFilterMode === "DIA") {
-    return selectedDay ? createdAt.toISOString().slice(0, 10) === selectedDay : true;
+    return selectedDay ? formatDateInputValue(createdAt) === selectedDay : true;
   }
 
   if (dateFilterMode === "SEMANA") {
@@ -92,11 +97,11 @@ function matchesSelectedDateFilter(
   }
 
   if (dateFilterMode === "MES") {
-    return selectedMonth ? createdAt.toISOString().slice(0, 7) === selectedMonth : true;
+    return selectedMonth ? formatMonthInputValue(createdAt) === selectedMonth : true;
   }
 
   if (dateFilterMode === "ANO") {
-    return selectedYear ? createdAt.getFullYear() === Number(selectedYear) : true;
+    return selectedYear ? formatYearValue(createdAt) === selectedYear : true;
   }
 
   if (dateFilterMode === "PERIODO") {
@@ -123,9 +128,9 @@ function matchesSelectedDateFilter(
 
 export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
   const now = new Date();
-  const currentDay = now.toISOString().slice(0, 10);
-  const currentMonth = currentDay.slice(0, 7);
-  const currentYear = String(now.getFullYear());
+  const currentDay = formatDateInputValue(now);
+  const currentMonth = formatMonthInputValue(now);
+  const currentYear = formatYearValue(now);
   const currentWeek = getIsoWeekValue(now);
 
   const router = useRouter();
