@@ -169,19 +169,19 @@ export function CheckoutForm({
             Entrega e contato
           </p>
           <h1 className="mt-4 text-3xl font-black uppercase tracking-[-0.04em]">
-            Onde vamos levar seu pedido?
+            Falta so confirmar sua entrega
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)] sm:text-base">
-            Preencha seus dados para a loja receber tudo certinho, sem atraso e sem
-            precisar te chamar de novo no WhatsApp.
+            Preencha seus dados para a loja receber o pedido certinho e agilizar
+            seu atendimento.
           </p>
 
           <div className="mt-4 flex flex-wrap gap-3">
             <p className="glass-pill inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
-              Entrega {formatCurrency(activeDeliveryFee)}
+              Taxa {formatCurrency(activeDeliveryFee)}
             </p>
             <p className="glass-pill inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
-              Previsao{" "}
+              Prazo{" "}
               {formatDeliveryEstimate(
                 activeEstimatedDeliveryMin,
                 activeEstimatedDeliveryMax,
@@ -343,14 +343,14 @@ export function CheckoutForm({
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm leading-6 text-[var(--muted)]">
-            Depois voce ainda revisa tudo antes de enviar para a loja.
+            Voce ainda revisa tudo antes de enviar para a loja.
           </p>
           <button
             type="submit"
             disabled={isSubmitting || items.length === 0}
-            className="inline-flex min-h-12 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.2)] transition-transform duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)] disabled:shadow-none"
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.2)] transition-transform duration-200 hover:-translate-y-0.5 sm:w-auto disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)] disabled:shadow-none"
           >
-            {isSubmitting ? "Preparando..." : "Revisar pedido"}
+            {isSubmitting ? "Preparando..." : "Continuar para revisar"}
           </button>
         </div>
       </form>
@@ -360,7 +360,7 @@ export function CheckoutForm({
           Resumo
         </p>
         <h2 className="mt-4 text-2xl font-black uppercase tracking-[-0.03em]">
-          Seu pedido ate aqui
+          Resumo do pedido
         </h2>
         <div className="mt-5 space-y-4">
           {items.length === 0 ? (
@@ -419,7 +419,7 @@ export function CheckoutForm({
         </div>
 
         <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
-          O atendimento confere o pagamento e libera o pedido para a cozinha.
+          Depois do envio, o atendimento confirma o pagamento e libera para a cozinha.
         </p>
       </aside>
     </section>

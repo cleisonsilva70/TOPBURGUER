@@ -138,12 +138,11 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
               Atendimento
             </p>
             <h1 className="mt-4 text-3xl font-black uppercase tracking-[-0.04em] sm:text-4xl">
-              Confirmacao de pagamento
+              Atendimento e liberacao de pedidos
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted)] sm:text-base">
-              Aqui ficam apenas os pedidos aguardando pagamento. Quando o atendimento
-              marcar como pago, o pedido sai desta tela e entra automaticamente na
-              cozinha como novo.
+              Confirme os pedidos pagos e libere apenas o que estiver pronto para
+              seguir para a cozinha.
             </p>
           </div>
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -299,7 +298,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
                     ? "Confirmando..."
                     : order.paymentStatus === "PAGO"
                       ? "Pagamento confirmado"
-                      : "Marcar como pago"}
+                      : "Confirmar pagamento"}
                 </button>
               </div>
             </article>

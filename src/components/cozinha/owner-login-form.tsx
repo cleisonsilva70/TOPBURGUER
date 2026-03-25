@@ -45,11 +45,11 @@ export function OwnerLoginForm() {
           Area restrita
         </p>
         <h1 className="mt-4 text-4xl font-black uppercase tracking-[-0.04em] sm:text-5xl">
-          Entrada da equipe da loja
+          Acesso interno da operacao
         </h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--muted)]">
-          Este acesso libera atendimento, cozinha e painel interno. Use a senha
-          do proprietario para continuar com seguranca.
+          Esta area libera atendimento, cozinha e painel interno da loja. Use a
+          senha do responsavel para continuar.
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -127,7 +127,7 @@ export function OwnerLoginForm() {
           disabled={isSubmitting}
           className="pulse-glow mt-6 inline-flex w-full items-center justify-center rounded-full bg-[linear-gradient(180deg,rgba(184,68,31,1),rgba(145,47,18,1))] px-6 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white transition-colors hover:brightness-105 disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)] disabled:shadow-none"
         >
-          {isSubmitting ? "Entrando..." : "Entrar na operacao"}
+          {isSubmitting ? "Entrando..." : "Entrar no painel interno"}
         </button>
       </form>
     </div>

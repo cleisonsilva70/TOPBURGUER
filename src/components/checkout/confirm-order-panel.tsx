@@ -160,12 +160,11 @@ export function ConfirmOrderPanel() {
             Revisao final
           </span>
           <h1 className="mt-4 text-4xl font-black uppercase tracking-[-0.04em] sm:text-5xl">
-            Confira tudo antes de enviar para a loja
+            Ultima conferencia antes de enviar
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)] sm:text-[1.02rem]">
-            Assim que voce confirmar, o pedido segue para o WhatsApp da loja e entra
-            no atendimento. A cozinha so recebe depois que o pagamento for marcado
-            como confirmado pela equipe.
+            Confira seus dados, os itens e o total. Quando voce confirmar, o
+            pedido segue para a loja e entra no atendimento.
           </p>
         </div>
 
@@ -266,15 +265,15 @@ export function ConfirmOrderPanel() {
       ) : null}
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <button
-          type="button"
-          onClick={handleConfirm}
-          disabled={isSubmitting}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.26)] transition-transform duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)] disabled:shadow-none"
-        >
-          <MessageCircleMore size={18} />
-          {isSubmitting ? "Enviando pedido..." : "Confirmar e enviar para WhatsApp"}
-        </button>
+          <button
+            type="button"
+            onClick={handleConfirm}
+            disabled={isSubmitting}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-[0_18px_30px_rgba(145,47,18,0.26)] transition-transform duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[rgba(184,68,31,0.45)] disabled:shadow-none"
+          >
+            <MessageCircleMore size={18} />
+            {isSubmitting ? "Enviando pedido..." : "Enviar pedido para a loja"}
+          </button>
         <button
           type="button"
           onClick={() => router.push("/checkout")}
