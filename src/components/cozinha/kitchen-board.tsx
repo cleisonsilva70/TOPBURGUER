@@ -290,59 +290,63 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
               operacao da cozinha.
             </p>
           </div>
-          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:flex-wrap">
-            <div className="rounded-[26px] border border-[var(--line)] bg-white/80 px-5 py-4">
-              <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
-                Novos na fila
-              </p>
-              <strong className="mt-2 block text-3xl font-black">{totalNewOrders}</strong>
+          <div className="flex w-full max-w-[720px] flex-col gap-3 self-start lg:items-end">
+            <div className="flex w-full flex-wrap justify-start gap-3 lg:justify-end">
+              <button
+                type="button"
+                onClick={() => setSoundEnabled((current) => !current)}
+                className={cn(
+                  "rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] transition-colors",
+                  soundEnabled
+                    ? "glass-pill text-[var(--brand)]"
+                    : "glass-pill text-[var(--muted)] hover:bg-white",
+                )}
+              >
+                {soundEnabled ? "Campainha ligada" : "Campainha desligada"}
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setSoundProfile((current) =>
+                    current === "restaurant" ? "soft" : "restaurant",
+                  )
+                }
+                className="glass-pill inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+              >
+                <Volume2 size={16} />
+                {soundProfile === "restaurant" ? "Som restaurante" : "Som suave"}
+              </button>
+              <button
+                type="button"
+                onClick={playAlertTone}
+                className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+              >
+                Testar som
+              </button>
+              <Link
+                href="/atendimento"
+                className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+              >
+                Abrir atendimento
+              </Link>
+              <LogoutButton />
             </div>
-            <div className="rounded-[26px] border border-[rgba(184,68,31,0.12)] bg-[rgba(184,68,31,0.08)] px-5 py-4">
-              <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
-                Prioridade
-              </p>
-              <strong className="mt-2 block text-3xl font-black text-[var(--danger)]">
-                {totalDelayedOrders}
-              </strong>
+            <div className="grid w-full gap-3 sm:grid-cols-2">
+              <div className="rounded-[26px] border border-[var(--line)] bg-white/80 px-5 py-4">
+                <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
+                  Novos na fila
+                </p>
+                <strong className="mt-2 block text-3xl font-black">{totalNewOrders}</strong>
+              </div>
+              <div className="rounded-[26px] border border-[rgba(184,68,31,0.12)] bg-[rgba(184,68,31,0.08)] px-5 py-4">
+                <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
+                  Prioridade
+                </p>
+                <strong className="mt-2 block text-3xl font-black text-[var(--danger)]">
+                  {totalDelayedOrders}
+                </strong>
+              </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setSoundEnabled((current) => !current)}
-              className={cn(
-                "rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] transition-colors",
-                soundEnabled
-                  ? "glass-pill text-[var(--brand)]"
-                  : "glass-pill text-[var(--muted)] hover:bg-white",
-              )}
-            >
-              {soundEnabled ? "Campainha ligada" : "Campainha desligada"}
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                setSoundProfile((current) =>
-                  current === "restaurant" ? "soft" : "restaurant",
-                )
-              }
-              className="glass-pill inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
-            >
-              <Volume2 size={16} />
-              {soundProfile === "restaurant" ? "Som restaurante" : "Som suave"}
-            </button>
-            <button
-              type="button"
-              onClick={playAlertTone}
-              className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
-            >
-              Testar som
-            </button>
-            <Link
-              href="/atendimento"
-              className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
-            >
-              Abrir atendimento
-            </Link>
-            <LogoutButton />
           </div>
         </div>
       </header>
