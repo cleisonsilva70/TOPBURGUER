@@ -221,15 +221,14 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
             </p>
           </div>
           <div className="flex w-full max-w-[620px] flex-col gap-3 self-start lg:items-end">
+            <div className="flex w-full justify-end">
+              <LogoutButton />
+            </div>
             <div className="grid w-full gap-3 md:grid-cols-3">
               <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(35,21,15,0.96),rgba(57,31,21,0.92))] px-5 py-4 text-white shadow-[0_20px_50px_rgba(35,21,15,0.24)]">
                 <p className="text-xs uppercase tracking-[0.24em] text-white/70">Aguardando pagamento</p>
                 <strong className="mt-2 block text-3xl font-black">{pendingOrdersCount}</strong>
                 <p className="mt-2 text-xs text-white/70">{formatCurrency(totalPendingValue)}</p>
-              </div>
-              <div className="rounded-[26px] border border-[var(--line)] bg-white/80 px-5 py-4">
-                <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">Pagos no periodo</p>
-                <strong className="mt-2 block text-3xl font-black">{paidOrdersCount}</strong>
               </div>
               <div className="rounded-[26px] border border-[rgba(184,68,31,0.12)] bg-[rgba(184,68,31,0.08)] px-5 py-4">
                 <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">Em atraso</p>
@@ -237,9 +236,10 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
                   {delayedOrdersCount}
                 </strong>
               </div>
-            </div>
-            <div className="flex w-full justify-end">
-              <LogoutButton />
+              <div className="rounded-[26px] border border-[var(--line)] bg-white/80 px-5 py-4">
+                <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">Pagos no periodo</p>
+                <strong className="mt-2 block text-3xl font-black">{paidOrdersCount}</strong>
+              </div>
             </div>
           </div>
         </div>
