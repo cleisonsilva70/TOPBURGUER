@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { UploadField } from "@/components/admin/upload-field";
 import { formatCategoryLabel, orderStatusLabels } from "@/lib/constants";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDateTimeLabel } from "@/lib/format";
 import type { OrderStatus, ProductCategory, StoreCategory } from "@/lib/types";
 
 type AdminProduct = {
@@ -2035,8 +2035,8 @@ export function CatalogManager() {
                         </p>
                         <p className="mt-2 text-xs text-[var(--muted)]">
                           Ordem: {banner.displayOrder}
-                          {banner.startsAt ? ` | Inicia: ${new Date(banner.startsAt).toLocaleString("pt-BR")}` : ""}
-                          {banner.endsAt ? ` | Encerra: ${new Date(banner.endsAt).toLocaleString("pt-BR")}` : ""}
+                          {banner.startsAt ? ` | Inicia: ${formatDateTimeLabel(new Date(banner.startsAt))}` : ""}
+                          {banner.endsAt ? ` | Encerra: ${formatDateTimeLabel(new Date(banner.endsAt))}` : ""}
                         </p>
                       </div>
                       <button

@@ -1,3 +1,4 @@
+import { formatDateInputValue } from "./format";
 import type { CheckoutInput, PaymentMethod } from "./types";
 
 export type HostedPaymentSession = {
@@ -47,7 +48,7 @@ function sanitizePhone(phone: string) {
 function buildDueDateLabel() {
   const dueDate = new Date();
   dueDate.setDate(dueDate.getDate() + 1);
-  return dueDate.toISOString().slice(0, 10);
+  return formatDateInputValue(dueDate);
 }
 
 export function isHostedPaymentEnabled() {

@@ -40,6 +40,26 @@ export function formatTimeLabel(date: Date) {
   }).format(date);
 }
 
+export function formatDateLabel(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: APP_TIME_ZONE,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(date);
+}
+
+export function formatDateTimeLabel(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: APP_TIME_ZONE,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
 export function formatDateInputValue(date: Date) {
   const { year, month, day } = getDateParts(date);
   return `${year}-${month}-${day}`;
