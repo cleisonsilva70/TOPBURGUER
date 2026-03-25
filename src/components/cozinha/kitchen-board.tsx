@@ -275,7 +275,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
   return (
     <div className="space-y-8">
       <header className="panel-card luxury-section overflow-hidden p-6 sm:p-8">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="glass-pill inline-flex rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
               Operacao
@@ -290,12 +290,12 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
             </p>
           </div>
           <div className="flex w-full max-w-[720px] flex-col gap-3 self-start lg:items-end">
-            <div className="flex w-full flex-wrap justify-start gap-3 lg:justify-end">
+            <div className="grid w-full gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap lg:justify-end">
               <button
                 type="button"
                 onClick={() => setSoundEnabled((current) => !current)}
                 className={cn(
-                  "rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] transition-colors",
+                  "rounded-full px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] transition-colors sm:px-5 sm:text-sm",
                   soundEnabled
                     ? "glass-pill text-[var(--brand)]"
                     : "glass-pill text-[var(--muted)] hover:bg-white",
@@ -310,7 +310,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                     current === "restaurant" ? "soft" : "restaurant",
                   )
                 }
-                className="glass-pill inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+                className="glass-pill inline-flex items-center justify-center gap-2 rounded-full px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white sm:px-5 sm:text-sm"
               >
                 <Volume2 size={16} />
                 {soundProfile === "restaurant" ? "Som restaurante" : "Som suave"}
@@ -318,18 +318,18 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
               <button
                 type="button"
                 onClick={playAlertTone}
-                className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+                className="glass-pill rounded-full px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white sm:px-5 sm:text-sm"
               >
                 Testar som
               </button>
               <Link
                 href="/atendimento"
-                className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+                className="glass-pill inline-flex items-center justify-center rounded-full px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white sm:px-5 sm:text-sm"
               >
                 Abrir atendimento
               </Link>
             </div>
-            <div className="grid w-full gap-3 sm:grid-cols-2">
+            <div className="grid w-full gap-3 grid-cols-2">
               <div className="rounded-[26px] border border-[var(--line)] bg-white/80 px-5 py-4">
                 <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
                   Novos na fila
@@ -358,8 +358,8 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
       ) : null}
 
       <section>
-        <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <label className="relative block w-full max-w-md">
+        <div className="mb-4 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <label className="relative block w-full xl:max-w-md">
             <Search
               size={16}
               className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]"
@@ -371,7 +371,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
               className="w-full rounded-full border border-[var(--line)] bg-white py-3 pl-11 pr-4 text-sm"
             />
           </label>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:flex xl:flex-wrap">
             <div className="glass-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--brand-strong)]">
               {search ? "Filtro ativo" : "Todos os pedidos"}
             </div>
@@ -380,11 +380,11 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-4 xl:gap-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-4 xl:gap-5">
           {orderStatusSequence.map((status) => (
             <div
               key={status}
-              className="min-w-0 luxury-section rounded-[30px] border border-[var(--line)] bg-[rgba(255,248,241,0.84)] p-4 shadow-[0_20px_45px_rgba(73,38,18,0.08)]"
+              className="min-w-0 luxury-section rounded-[28px] border border-[var(--line)] bg-[rgba(255,248,241,0.84)] p-4 shadow-[0_20px_45px_rgba(73,38,18,0.08)] sm:rounded-[30px]"
             >
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
@@ -432,7 +432,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                       key={order.id}
                       className={cn(
                         "panel-card luxury-section relative min-w-0 overflow-hidden p-5 xl:p-6",
-                        "min-h-[360px]",
+                        "min-h-[320px] sm:min-h-[360px]",
                         isFresh
                           ? "border-[var(--brand)] shadow-[0_0_0_2px_rgba(184,68,31,0.12)]"
                           : isDelayed
@@ -447,8 +447,10 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
                             Pedido {order.orderNumberFormatted}
                           </p>
-                          <h3 className="mt-2 text-2xl font-black">{order.customerName}</h3>
-                          <p className="mt-1 text-sm text-[var(--muted)]">
+                          <h3 className="mt-2 break-words text-xl font-black leading-tight sm:text-2xl">
+                            {order.customerName}
+                          </h3>
+                          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
                             {order.displayTime} | {orderStatusLabels[order.status]}
                           </p>
                           {isFresh ? (
@@ -497,7 +499,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                             </p>
                             <ul className="mt-3 space-y-2 text-sm leading-6 text-white/85">
                             {order.items.map((item) => (
-                              <li key={item.id}>
+                              <li key={item.id} className="break-words">
                                 {"\u2022"} {item.productName}
                                 <br />
                                 {item.quantity}x {formatCurrency(item.unitPrice)} ={" "}
