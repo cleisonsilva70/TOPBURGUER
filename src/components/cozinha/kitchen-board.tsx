@@ -380,11 +380,11 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
             </div>
           </div>
         </div>
-        <div className="grid gap-5 xl:grid-cols-2 2xl:grid-cols-4">
+        <div className="grid grid-cols-4 gap-4 xl:gap-5">
           {orderStatusSequence.map((status) => (
             <div
               key={status}
-              className="luxury-section rounded-[30px] border border-[var(--line)] bg-[rgba(255,248,241,0.84)] p-4 shadow-[0_20px_45px_rgba(73,38,18,0.08)]"
+              className="min-w-0 luxury-section rounded-[30px] border border-[var(--line)] bg-[rgba(255,248,241,0.84)] p-4 shadow-[0_20px_45px_rgba(73,38,18,0.08)]"
             >
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
@@ -431,7 +431,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                     <article
                       key={order.id}
                       className={cn(
-                        "panel-card luxury-section relative overflow-hidden p-6",
+                        "panel-card luxury-section relative min-w-0 overflow-hidden p-5 xl:p-6",
                         "min-h-[360px]",
                         isFresh
                           ? "border-[var(--brand)] shadow-[0_0_0_2px_rgba(184,68,31,0.12)]"
