@@ -410,32 +410,6 @@ export function CatalogManager() {
     [banners],
   );
 
-  const deliveredOrdersCount = useMemo(
-    () => orders.filter((order) => order.status === "ENTREGUE").length,
-    [orders],
-  );
-  const paidOrdersCount = useMemo(
-    () => orders.filter((order) => order.paymentStatus === "PAGO").length,
-    [orders],
-  );
-  const pendingOrdersCount = useMemo(
-    () => orders.filter((order) => order.paymentStatus === "PENDENTE").length,
-    [orders],
-  );
-  const totalRevenue = useMemo(
-    () =>
-      orders
-        .filter((order) => order.paymentStatus === "PAGO")
-        .reduce((acc, order) => acc + order.total, 0),
-    [orders],
-  );
-  const averageTicket = useMemo(
-    () => (paidOrdersCount > 0 ? totalRevenue / paidOrdersCount : 0),
-    [paidOrdersCount, totalRevenue],
-  );
-
-  const recentOrders = useMemo(() => orders.slice(0, 6), [orders]);
-
   const filteredOrderHistory = useMemo(() => {
     const term = orderSearch.trim().toLowerCase();
 
@@ -868,71 +842,6 @@ export function CatalogManager() {
               <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
                 Banners ativos na vitrine principal da loja.
               </p>
-            </article>
-            <article className="panel-card luxury-section p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
-                Pagos
-              </p>
-              <p className="mt-4 text-4xl font-black">{paidOrdersCount}</p>
-              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                Pedidos com pagamento confirmado nesta operacao.
-              </p>
-            </article>
-            <article className="panel-card luxury-section p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
-                Pendentes
-              </p>
-              <p className="mt-4 text-4xl font-black">{pendingOrdersCount}</p>
-              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                Pedidos aguardando confirmacao no atendimento.
-              </p>
-            </article>
-            <article className="panel-card luxury-section p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
-                Faturamento
-              </p>
-              <p className="mt-4 text-4xl font-black">{formatCurrency(totalRevenue)}</p>
-              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                Total pago registrado nesta base ate agora.
-              </p>
-            </article>
-            <article className="panel-card luxury-section p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
-                Ticket medio
-              </p>
-              <p className="mt-4 text-4xl font-black">{formatCurrency(averageTicket)}</p>
-              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                Media de venda considerando os pedidos pagos.
-              </p>
-            </article>
-            <article className="panel-card luxury-section p-5 md:col-span-2 xl:col-span-4">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
-                    Historico rapido
-                  </p>
-                  <p className="mt-4 text-4xl font-black">{orders.length}</p>
-                  <p className="mt-2 text-sm text-[var(--muted)]">
-                    {deliveredOrdersCount} pedidos ja foram concluidos nesta base.
-                  </p>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {recentOrders.slice(0, 3).map((order) => (
-                    <div
-                      key={order.id}
-                      className="rounded-[22px] border border-[var(--line)] bg-white/80 p-4"
-                    >
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--brand-strong)]">
-                        Pedido {order.orderNumberFormatted}
-                      </p>
-                      <p className="mt-2 text-sm font-bold">{order.customerName}</p>
-                      <p className="mt-1 text-sm text-[var(--muted)]">
-                        {order.displayTime} | {orderStatusLabels[order.status]}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </article>
           </section>
 
