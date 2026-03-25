@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Search } from "lucide-react";
@@ -221,7 +222,15 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
             </p>
           </div>
           <div className="flex w-full max-w-[620px] flex-col gap-3 self-start lg:items-end">
-            <div className="flex w-full justify-end">
+            <div className="flex w-full justify-end gap-3">
+              <Link
+                href="/cozinha"
+                target="_blank"
+                rel="noreferrer"
+                className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
+              >
+                Ir para cozinha
+              </Link>
               <LogoutButton />
             </div>
             <div className="grid w-full gap-3 md:grid-cols-3">
