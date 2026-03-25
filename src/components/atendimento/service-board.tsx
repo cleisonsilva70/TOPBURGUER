@@ -251,6 +251,49 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
         </section>
       ) : null}
 
+      <section className="panel-card luxury-section p-5 sm:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
+              Periodo dos indicadores
+            </p>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+              Escolha o periodo que deve ser considerado nos blocos de faturamento,
+              ticket medio e totais do atendimento.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {([
+              ["HOJE", "Hoje"],
+              ["ONTEM", "Ontem"],
+              ["7_DIAS", "Ultimos 7 dias"],
+              ["DATA", "Data especifica"],
+            ] as const).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setDateFilter(value)}
+                className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${
+                  dateFilter === value
+                    ? "bg-[var(--accent)] text-[var(--foreground)]"
+                    : "glass-pill text-[var(--foreground)]"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+            {dateFilter === "DATA" ? (
+              <input
+                type="date"
+                value={customDate}
+                onChange={(event) => setCustomDate(event.target.value)}
+                className="rounded-full border border-[var(--line)] bg-white px-4 py-2 text-sm"
+              />
+            ) : null}
+          </div>
+        </div>
+      </section>
+
       <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         <article className="panel-card luxury-section p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
@@ -355,53 +398,32 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="panel-subtle flex flex-col gap-3 rounded-[24px] p-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--brand-strong)]">
+                  Filtro por pagamento no historico
+                </p>
+                <p className="mt-1 text-sm text-[var(--muted)]">
+                  Filtre a lista abaixo por Pix, dinheiro ou cartao.
+                </p>
+              </div>
               {(["TODOS", "PIX", "DINHEIRO", "CARTAO_CREDITO", "CARTAO_DEBITO"] as const).map(
                 (value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setPaymentFilter(value)}
-                    className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${
-                      paymentFilter === value
-                        ? "bg-[var(--foreground)] text-white"
-                        : "glass-pill text-[var(--foreground)]"
-                    }`}
-                  >
-                    {value === "TODOS" ? "Todos pagamentos" : paymentLabels[value]}
-                  </button>
+                  <div key={value} className="inline-flex">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentFilter(value)}
+                      className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${
+                        paymentFilter === value
+                          ? "bg-[var(--foreground)] text-white"
+                          : "glass-pill text-[var(--foreground)]"
+                      }`}
+                    >
+                      {value === "TODOS" ? "Todos pagamentos" : paymentLabels[value]}
+                    </button>
+                  </div>
                 ),
               )}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {([
-                ["HOJE", "Hoje"],
-                ["ONTEM", "Ontem"],
-                ["7_DIAS", "Ultimos 7 dias"],
-                ["DATA", "Data especifica"],
-              ] as const).map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setDateFilter(value)}
-                  className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${
-                    dateFilter === value
-                      ? "bg-[var(--accent)] text-[var(--foreground)]"
-                      : "glass-pill text-[var(--foreground)]"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-              {dateFilter === "DATA" ? (
-                <input
-                  type="date"
-                  value={customDate}
-                  onChange={(event) => setCustomDate(event.target.value)}
-                  className="rounded-full border border-[var(--line)] bg-white px-4 py-2 text-sm"
-                />
-              ) : null}
             </div>
           </div>
         </div>
