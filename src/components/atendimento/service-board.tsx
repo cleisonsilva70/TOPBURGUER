@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Search } from "lucide-react";
@@ -24,6 +23,38 @@ async function fetchAtendimentoOrders(): Promise<Order[]> {
   }
 
   return response.json();
+}
+
+function matchesSelectedDateFilter(
+  createdAtValue: string,
+  dateFilter: "HOJE" | "ONTEM" | "7_DIAS" | "DATA",
+  customDate: string,
+) {
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfYesterday = new Date(startOfToday);
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+  const startOfSevenDays = new Date(startOfToday);
+  startOfSevenDays.setDate(startOfSevenDays.getDate() - 6);
+  const createdAt = new Date(createdAtValue);
+
+  if (dateFilter === "HOJE") {
+    return createdAt >= startOfToday;
+  }
+
+  if (dateFilter === "ONTEM") {
+    return createdAt >= startOfYesterday && createdAt < startOfToday;
+  }
+
+  if (dateFilter === "7_DIAS") {
+    return createdAt >= startOfSevenDays;
+  }
+
+  if (dateFilter === "DATA") {
+    return customDate ? createdAt.toISOString().slice(0, 10) === customDate : true;
+  }
+
+  return true;
 }
 
 export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
@@ -57,60 +88,61 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
     return () => window.clearInterval(timer);
   }, [router]);
 
+  const ordersInSelectedPeriod = useMemo(
+    () =>
+      orders.filter((order) =>
+        matchesSelectedDateFilter(order.createdAt, dateFilter, customDate),
+      ),
+    [customDate, dateFilter, orders],
+  );
+
   const totalPendingValue = useMemo(
     () =>
-      orders
+      ordersInSelectedPeriod
         .filter((order) => order.paymentStatus === "PENDENTE")
         .reduce((acc, order) => acc + order.total, 0),
-    [orders],
+    [ordersInSelectedPeriod],
   );
 
   const paidOrdersCount = useMemo(
-    () => orders.filter((order) => order.paymentStatus === "PAGO").length,
-    [orders],
+    () => ordersInSelectedPeriod.filter((order) => order.paymentStatus === "PAGO").length,
+    [ordersInSelectedPeriod],
   );
 
   const pendingOrdersCount = useMemo(
-    () => orders.filter((order) => order.paymentStatus === "PENDENTE").length,
-    [orders],
+    () => ordersInSelectedPeriod.filter((order) => order.paymentStatus === "PENDENTE").length,
+    [ordersInSelectedPeriod],
   );
   const delayedOrdersCount = useMemo(
     () =>
-      orders.filter((order) => {
+      ordersInSelectedPeriod.filter((order) => {
         if (order.paymentStatus !== "PENDENTE") {
           return false;
         }
 
         return Date.now() - new Date(order.createdAt).getTime() >= 15 * 60 * 1000;
       }).length,
-    [orders],
+    [ordersInSelectedPeriod],
   );
   const deliveredOrdersCount = useMemo(
-    () => orders.filter((order) => order.status === "ENTREGUE").length,
-    [orders],
+    () => ordersInSelectedPeriod.filter((order) => order.status === "ENTREGUE").length,
+    [ordersInSelectedPeriod],
   );
   const totalRevenue = useMemo(
     () =>
-      orders
+      ordersInSelectedPeriod
         .filter((order) => order.paymentStatus === "PAGO")
         .reduce((acc, order) => acc + order.total, 0),
-    [orders],
+    [ordersInSelectedPeriod],
   );
   const averageTicket = useMemo(
     () => (paidOrdersCount > 0 ? totalRevenue / paidOrdersCount : 0),
     [paidOrdersCount, totalRevenue],
   );
-  const recentOrders = useMemo(() => orders.slice(0, 3), [orders]);
+  const recentOrders = useMemo(() => ordersInSelectedPeriod.slice(0, 3), [ordersInSelectedPeriod]);
 
   const filteredOrders = useMemo(() => {
     const term = search.trim().toLowerCase();
-    const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startOfYesterday = new Date(startOfToday);
-    startOfYesterday.setDate(startOfYesterday.getDate() - 1);
-    const startOfSevenDays = new Date(startOfToday);
-    startOfSevenDays.setDate(startOfSevenDays.getDate() - 6);
-
     return orders.filter((order) => {
       const matchesStatus =
         filter === "PENDENTES"
@@ -118,17 +150,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
           : order.paymentStatus === "PAGO";
       const matchesPayment =
         paymentFilter === "TODOS" || order.paymentMethod === paymentFilter;
-      const createdAt = new Date(order.createdAt);
-      const matchesDate =
-        dateFilter === "HOJE"
-          ? createdAt >= startOfToday
-          : dateFilter === "ONTEM"
-            ? createdAt >= startOfYesterday && createdAt < startOfToday
-            : dateFilter === "7_DIAS"
-              ? createdAt >= startOfSevenDays
-              : customDate
-                ? createdAt.toISOString().slice(0, 10) === customDate
-                : true;
+      const matchesDate = matchesSelectedDateFilter(order.createdAt, dateFilter, customDate);
 
       const matchesSearch =
         !term ||
@@ -138,7 +160,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
 
       return matchesStatus && matchesPayment && matchesDate && matchesSearch;
     });
-  }, [customDate, dateFilter, filter, orders, paymentFilter, search]);
+  }, [filter, orders, paymentFilter, search, dateFilter, customDate]);
 
   function getWaitMinutes(createdAt: string) {
     return Math.max(0, Math.round((Date.now() - new Date(createdAt).getTime()) / 60000));
@@ -200,16 +222,12 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
           </div>
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(35,21,15,0.96),rgba(57,31,21,0.92))] px-5 py-4 text-white shadow-[0_20px_50px_rgba(35,21,15,0.24)]">
-              <p className="text-xs uppercase tracking-[0.24em] text-white/70">
-                Aguardando pagamento
-              </p>
+              <p className="text-xs uppercase tracking-[0.24em] text-white/70">Aguardando pagamento</p>
               <strong className="mt-2 block text-3xl font-black">{pendingOrdersCount}</strong>
               <p className="mt-2 text-xs text-white/70">{formatCurrency(totalPendingValue)}</p>
             </div>
             <div className="rounded-[26px] border border-[var(--line)] bg-white/80 px-5 py-4">
-              <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
-                Pagos hoje
-              </p>
+              <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">Pagos no periodo</p>
               <strong className="mt-2 block text-3xl font-black">{paidOrdersCount}</strong>
             </div>
             <div className="rounded-[26px] border border-[rgba(184,68,31,0.12)] bg-[rgba(184,68,31,0.08)] px-5 py-4">
@@ -220,18 +238,6 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
                 {delayedOrdersCount}
               </strong>
             </div>
-            <Link
-              href="/cozinha"
-              className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
-            >
-              Ir para cozinha
-            </Link>
-            <Link
-              href="/painel"
-              className="glass-pill rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[var(--foreground)] transition-colors hover:bg-white"
-            >
-              Editar catalogo
-            </Link>
             <LogoutButton />
           </div>
         </div>
@@ -252,7 +258,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
           </p>
           <p className="mt-4 text-4xl font-black">{paidOrdersCount}</p>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-            Pedidos com pagamento confirmado nesta operacao.
+            Pedidos com pagamento confirmado dentro do periodo filtrado.
           </p>
         </article>
         <article className="panel-card luxury-section p-5">
@@ -270,7 +276,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
           </p>
           <p className="mt-4 text-4xl font-black">{formatCurrency(totalRevenue)}</p>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-            Total pago registrado nesta base ate agora.
+            Total pago registrado no periodo selecionado.
           </p>
         </article>
         <article className="panel-card luxury-section p-5">
@@ -279,7 +285,7 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
           </p>
           <p className="mt-4 text-4xl font-black">{formatCurrency(averageTicket)}</p>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-            Media de venda considerando os pedidos pagos.
+            Media de venda considerando os pedidos pagos no periodo.
           </p>
         </article>
         <article className="panel-card luxury-section p-5 md:col-span-2 xl:col-span-4">
@@ -288,9 +294,9 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-strong)]">
                 Historico rapido
               </p>
-              <p className="mt-4 text-4xl font-black">{orders.length}</p>
+              <p className="mt-4 text-4xl font-black">{ordersInSelectedPeriod.length}</p>
               <p className="mt-2 text-sm text-[var(--muted)]">
-                {deliveredOrdersCount} pedidos ja foram concluidos nesta base.
+                {deliveredOrdersCount} pedidos ja foram concluidos neste periodo.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
