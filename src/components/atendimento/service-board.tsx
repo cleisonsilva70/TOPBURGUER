@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Search } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { paymentLabels, paymentStatusLabels } from "@/lib/constants";
-import type { Order } from "@/lib/types";
+import type { Order, PaymentMethod } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "@/components/cozinha/logout-button";
 
@@ -33,6 +33,9 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
   const [boardError, setBoardError] = useState("");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"PENDENTES" | "PAGOS">("PENDENTES");
+  const [paymentFilter, setPaymentFilter] = useState<PaymentMethod | "TODOS">("TODOS");
+  const [dateFilter, setDateFilter] = useState<"HOJE" | "ONTEM" | "7_DIAS" | "DATA">("HOJE");
+  const [customDate, setCustomDate] = useState("");
 
   useEffect(() => {
     const timer = window.setInterval(async () => {
@@ -71,6 +74,17 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
     () => orders.filter((order) => order.paymentStatus === "PENDENTE").length,
     [orders],
   );
+  const delayedOrdersCount = useMemo(
+    () =>
+      orders.filter((order) => {
+        if (order.paymentStatus !== "PENDENTE") {
+          return false;
+        }
+
+        return Date.now() - new Date(order.createdAt).getTime() >= 15 * 60 * 1000;
+      }).length,
+    [orders],
+  );
   const deliveredOrdersCount = useMemo(
     () => orders.filter((order) => order.status === "ENTREGUE").length,
     [orders],
@@ -90,12 +104,31 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
 
   const filteredOrders = useMemo(() => {
     const term = search.trim().toLowerCase();
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfYesterday = new Date(startOfToday);
+    startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+    const startOfSevenDays = new Date(startOfToday);
+    startOfSevenDays.setDate(startOfSevenDays.getDate() - 6);
 
     return orders.filter((order) => {
       const matchesStatus =
         filter === "PENDENTES"
           ? order.paymentStatus === "PENDENTE"
           : order.paymentStatus === "PAGO";
+      const matchesPayment =
+        paymentFilter === "TODOS" || order.paymentMethod === paymentFilter;
+      const createdAt = new Date(order.createdAt);
+      const matchesDate =
+        dateFilter === "HOJE"
+          ? createdAt >= startOfToday
+          : dateFilter === "ONTEM"
+            ? createdAt >= startOfYesterday && createdAt < startOfToday
+            : dateFilter === "7_DIAS"
+              ? createdAt >= startOfSevenDays
+              : customDate
+                ? createdAt.toISOString().slice(0, 10) === customDate
+                : true;
 
       const matchesSearch =
         !term ||
@@ -103,9 +136,13 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
         order.orderNumberFormatted.toLowerCase().includes(term) ||
         order.phone.toLowerCase().includes(term);
 
-      return matchesStatus && matchesSearch;
+      return matchesStatus && matchesPayment && matchesDate && matchesSearch;
     });
-  }, [filter, orders, search]);
+  }, [customDate, dateFilter, filter, orders, paymentFilter, search]);
+
+  function getWaitMinutes(createdAt: string) {
+    return Math.max(0, Math.round((Date.now() - new Date(createdAt).getTime()) / 60000));
+  }
 
   async function markAsPaid(orderId: string) {
     setLoadingId(orderId);
@@ -174,6 +211,14 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
                 Pagos hoje
               </p>
               <strong className="mt-2 block text-3xl font-black">{paidOrdersCount}</strong>
+            </div>
+            <div className="rounded-[26px] border border-[rgba(184,68,31,0.12)] bg-[rgba(184,68,31,0.08)] px-5 py-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
+                Em atraso
+              </p>
+              <strong className="mt-2 block text-3xl font-black text-[var(--danger)]">
+                {delayedOrdersCount}
+              </strong>
             </div>
             <Link
               href="/cozinha"
@@ -270,36 +315,88 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
 
       <section className="grid gap-5 xl:grid-cols-2">
         <div className="xl:col-span-2 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <label className="relative block w-full max-w-md">
-            <Search
-              size={16}
-              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]"
-            />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Buscar por cliente, telefone ou pedido"
-              className="w-full rounded-full border border-[var(--line)] bg-white py-3 pl-11 pr-4 text-sm"
-            />
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {[
-              ["PENDENTES", `Pendentes (${pendingOrdersCount})`],
-              ["PAGOS", `Pagos (${paidOrdersCount})`],
-            ].map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setFilter(value as "PENDENTES" | "PAGOS")}
-                className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${
-                  filter === value
-                    ? "bg-[var(--brand)] text-white"
-                    : "glass-pill text-[var(--foreground)]"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="flex w-full flex-col gap-4">
+            <label className="relative block w-full max-w-md">
+              <Search
+                size={16}
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]"
+              />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Buscar por cliente, telefone ou pedido"
+                className="w-full rounded-full border border-[var(--line)] bg-white py-3 pl-11 pr-4 text-sm"
+              />
+            </label>
+
+            <div className="flex flex-wrap gap-2">
+              {[
+                ["PENDENTES", `Pendentes (${pendingOrdersCount})`],
+                ["PAGOS", `Pagos (${paidOrdersCount})`],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setFilter(value as "PENDENTES" | "PAGOS")}
+                  className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${
+                    filter === value
+                      ? "bg-[var(--brand)] text-white"
+                      : "glass-pill text-[var(--foreground)]"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {(["TODOS", "PIX", "DINHEIRO", "CARTAO_CREDITO", "CARTAO_DEBITO"] as const).map(
+                (value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setPaymentFilter(value)}
+                    className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${
+                      paymentFilter === value
+                        ? "bg-[var(--foreground)] text-white"
+                        : "glass-pill text-[var(--foreground)]"
+                    }`}
+                  >
+                    {value === "TODOS" ? "Todos pagamentos" : paymentLabels[value]}
+                  </button>
+                ),
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {([
+                ["HOJE", "Hoje"],
+                ["ONTEM", "Ontem"],
+                ["7_DIAS", "Ultimos 7 dias"],
+                ["DATA", "Data especifica"],
+              ] as const).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setDateFilter(value)}
+                  className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${
+                    dateFilter === value
+                      ? "bg-[var(--accent)] text-[var(--foreground)]"
+                      : "glass-pill text-[var(--foreground)]"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+              {dateFilter === "DATA" ? (
+                <input
+                  type="date"
+                  value={customDate}
+                  onChange={(event) => setCustomDate(event.target.value)}
+                  className="rounded-full border border-[var(--line)] bg-white px-4 py-2 text-sm"
+                />
+              ) : null}
+            </div>
           </div>
         </div>
         {filteredOrders.length === 0 ? (
@@ -313,7 +410,11 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
               className={cn(
                 "panel-card luxury-section relative overflow-hidden p-6",
                 loadingId === order.id ? "opacity-75" : "",
-                order.paymentStatus === "PENDENTE" ? "border-[rgba(184,68,31,0.18)]" : "",
+                getWaitMinutes(order.createdAt) >= 15 && order.paymentStatus === "PENDENTE"
+                  ? "border-[rgba(179,63,47,0.26)] shadow-[0_0_0_2px_rgba(179,63,47,0.08)]"
+                  : order.paymentStatus === "PENDENTE"
+                    ? "border-[rgba(184,68,31,0.18)]"
+                    : "",
               )}
             >
               <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-[color-mix(in_srgb,var(--accent)_32%,transparent)] blur-2xl" />
@@ -329,6 +430,11 @@ export function ServiceBoard({ initialOrders }: { initialOrders: Order[] }) {
                   {Date.now() - new Date(order.createdAt).getTime() <= 8 * 60 * 1000 ? (
                     <p className="mt-2 inline-flex rounded-full bg-[var(--accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--foreground)]">
                       Pedido novo
+                    </p>
+                  ) : null}
+                  {getWaitMinutes(order.createdAt) >= 15 && order.paymentStatus === "PENDENTE" ? (
+                    <p className="mt-2 inline-flex rounded-full bg-[rgba(179,63,47,0.12)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--danger)]">
+                      Aguardando ha {getWaitMinutes(order.createdAt)} min
                     </p>
                   ) : null}
                 </div>
