@@ -1,9 +1,21 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { isInlineImage } from "@/lib/image-reference";
 
-export function OwnerLoginForm() {
+type OwnerLoginFormProps = {
+  logoPath: string;
+  logoText: string;
+  storeName: string;
+};
+
+export function OwnerLoginForm({
+  logoPath,
+  logoText,
+  storeName,
+}: OwnerLoginFormProps) {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -91,9 +103,22 @@ export function OwnerLoginForm() {
       </section>
 
       <form onSubmit={handleSubmit} className="panel-card luxury-section overflow-hidden p-8 sm:p-10">
-        <div className="float-soft inline-flex h-14 w-14 items-center justify-center rounded-[20px] bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] text-xl font-black uppercase text-white shadow-[0_18px_30px_rgba(145,47,18,0.22)]">
-          OP
-        </div>
+        {logoPath ? (
+          <div className="float-soft relative h-16 w-16 overflow-hidden rounded-[22px] border border-[var(--line)] bg-white shadow-[0_18px_30px_rgba(145,47,18,0.12)]">
+            <Image
+              src={logoPath}
+              alt={storeName}
+              fill
+              className="object-cover"
+              sizes="64px"
+              unoptimized={isInlineImage(logoPath)}
+            />
+          </div>
+        ) : (
+          <div className="float-soft inline-flex h-14 w-14 items-center justify-center rounded-[20px] bg-[linear-gradient(135deg,var(--brand),var(--brand-strong))] text-xl font-black uppercase text-white shadow-[0_18px_30px_rgba(145,47,18,0.22)]">
+            {logoText}
+          </div>
+        )}
         <p className="mt-6 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-strong)]">
           Login
         </p>
